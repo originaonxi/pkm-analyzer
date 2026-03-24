@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PKM Analyzer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
+
+  h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .subtitle { color: #888; font-size: 0.95rem; margin-bottom: 32px; }
+
+  /* Input Section */
+  .input-section { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+
+  .toggle-bar { display: flex; gap: 0; margin-bottom: 16px; background: #1a1a1a; border-radius: 8px; overflow: hidden; border: 1px solid #222; }
+  .toggle-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #888; transition: all 0.2s; border: none; background: none; }
+  .toggle-btn.active { background: #222; color: #fff; }
+
+  textarea { width: 100%; height: 140px; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 14px; color: #e0e0e0; font-size: 0.9rem; resize: vertical; font-family: inherit; }
+  textarea:focus { outline: none; border-color: #555; }
+  textarea::placeholder { color: #555; }
+
+  .url-input { width: 100%; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 14px; color: #e0e0e0; font-size: 0.9rem; font-family: inherit; }
+  .url-input:focus { outline: none; border-color: #555; }
+  .url-input::placeholder { color: #555; }
+
+  .url-note { color: #f59e0b; font-size: 0.78rem; margin-top: 8px; }
+
+  .analyze-btn { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 16px; transition: opacity 0.2s; }
+  .analyze-btn:hover { opacity: 0.85; }
+  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Result Section */
+  .result-section { display: none; }
+  .result-section.visible { display: block; }
+
+  .result-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding: 20px; background: #141414; border: 1px solid #222; border-radius: 12px; }
+  .mode-badge { background: #fff; color: #000; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; }
+  .result-meta { flex: 1; }
+  .result-meta h2 { font-size: 1.1rem; color: #fff; margin-bottom: 4px; }
+  .result-meta p { color: #888; font-size: 0.85rem; }
+  .confidence-pill { background: #1a1a1a; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; color: #aaa; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .detail-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 18px; }
+  .detail-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
+  .detail-card p { font-size: 0.9rem; color: #ccc; line-height: 1.5; }
+  .detail-card.full { grid-column: 1 / -1; }
+
+  .message-card { background: #141414; border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 32px; position: relative; }
+  .message-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; }
+  .message-text { font-size: 1rem; line-height: 1.6; color: #fff; white-space: pre-wrap; }
+  .copy-btn { position: absolute; top: 16px; right: 16px; background: #222; border: 1px solid #333; color: #aaa; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+  .copy-btn:hover { background: #333; color: #fff; }
+
+  .forbidden-list { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .forbidden-list li { background: #1c0a0a; border: 1px solid #3a1515; color: #e55; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; }
+
+  /* Modes Grid */
+  .modes-section { margin-top: 40px; }
+  .modes-section h2 { font-size: 1.1rem; color: #fff; margin-bottom: 16px; }
+  .modes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .mode-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 16px; cursor: default; transition: border-color 0.2s; }
+  .mode-card.highlighted { border-color: #fff; background: #1a1a1a; }
+  .mode-card .mode-name { font-weight: 700; font-size: 0.85rem; color: #fff; margin-bottom: 4px; letter-spacing: 0.3px; }
+  .mode-card .mode-who { font-size: 0.78rem; color: #888; margin-bottom: 8px; }
+  .mode-card .mode-desc { font-size: 0.82rem; color: #666; line-height: 1.4; }
+
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg { color: #e55; font-size: 0.85rem; margin-top: 8px; }
+
+  @media (max-width: 640px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .modes-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>PKM Analyzer</h1>
+  <p class="subtitle">Detect defense modes. Generate bypass messages. Based on Friestad & Wright (1994).</p>
+
+  <div class="input-section">
+    <div class="toggle-bar">
+      <button class="toggle-btn active" onclick="setMode('text')">Paste Text</button>
+      <button class="toggle-btn" onclick="setMode('url')">LinkedIn URL</button>
+    </div>
+    <div id="text-input">
+      <textarea id="profile-text" placeholder="Paste a LinkedIn bio, headline, or any profile text..."></textarea>
+    </div>
+    <div id="url-input" style="display:none">
+      <input class="url-input" id="profile-url" type="url" placeholder="https://linkedin.com/in/username">
+      <p class="url-note">Requires a working RapidAPI LinkedIn subscription. Configure RAPIDAPI_KEY in .env</p>
+    </div>
+    <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">Analyze Profile</button>
+    <p class="error-msg" id="error-msg"></p>
+  </div>
+
+  <div class="result-section" id="result-section">
+    <div class="result-header">
+      <span class="mode-badge" id="r-mode-badge"></span>
+      <div class="result-meta">
+        <h2 id="r-label"></h2>
+        <p id="r-reasoning"></p>
+      </div>
+      <span class="confidence-pill" id="r-confidence"></span>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-card">
+        <h3>Who They Are</h3>
+        <p id="r-who"></p>
+      </div>
+      <div class="detail-card">
+        <h3>Awareness Score</h3>
+        <p id="r-awareness"></p>
+      </div>
+      <div class="detail-card full">
+        <h3>Bypass Strategy</h3>
+        <p id="r-strategy"></p>
+      </div>
+      <div class="detail-card full">
+        <h3>Forbidden Phrases</h3>
+        <ul class="forbidden-list" id="r-forbidden"></ul>
+      </div>
+    </div>
+
+    <div class="message-card">
+      <h3>Generated Bypass Message</h3>
+      <button class="copy-btn" onclick="copyMessage()">Copy</button>
+      <div class="message-text" id="r-message"></div>
+    </div>
+  </div>
+
+  <div class="modes-section">
+    <h2>All 10 Defense Modes</h2>
+    <div class="modes-grid" id="modes-grid"></div>
+  </div>
+</div>
+
+<script>
+  let inputMode = 'text';
+
+  function setMode(mode) {
+    inputMode = mode;
+    document.querySelectorAll('.toggle-btn').forEach((b, i) => {
+      b.classList.toggle('active', (i === 0 && mode === 'text') || (i === 1 && mode === 'url'));
+    });
+    document.getElementById('text-input').style.display = mode === 'text' ? 'block' : 'none';
+    document.getElementById('url-input').style.display = mode === 'url' ? 'block' : 'none';
+  }
+
+  async function runAnalysis() {
+    const btn = document.getElementById('analyze-btn');
+    const err = document.getElementById('error-msg');
+    err.textContent = '';
+
+    const body = {};
+    if (inputMode === 'text') {
+      const text = document.getElementById('profile-text').value.trim();
+      if (!text) { err.textContent = 'Paste some profile text first.'; return; }
+      body.text = text;
+    } else {
+      const url = document.getElementById('profile-url').value.trim();
+      if (!url) { err.textContent = 'Enter a LinkedIn URL.'; return; }
+      body.url = url;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Analyzing...';
+
+    try {
+      const res = await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.detail || `Error ${res.status}`);
+      }
+      const data = await res.json();
+      showResult(data);
+    } catch (e) {
+      err.textContent = e.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Analyze Profile';
+    }
+  }
+
+  function showResult(d) {
+    document.getElementById('result-section').classList.add('visible');
+    document.getElementById('r-mode-badge').textContent = d.detected_mode;
+    document.getElementById('r-label').textContent = d.label;
+    document.getElementById('r-reasoning').textContent = d.reasoning;
+    document.getElementById('r-confidence').textContent = `${d.confidence}% confidence`;
+    document.getElementById('r-who').textContent = d.who_they_are;
+    document.getElementById('r-awareness').textContent = `${d.awareness_score} / 10 — ${d.awareness_score >= 7 ? 'High awareness. Tread carefully.' : d.awareness_score >= 4 ? 'Moderate awareness. Standard bypass works.' : 'Low awareness. Direct approach viable.'}`;
+    document.getElementById('r-strategy').textContent = d.bypass_strategy;
+    document.getElementById('r-message').textContent = d.generated_message;
+
+    const fl = document.getElementById('r-forbidden');
+    fl.innerHTML = '';
+    (d.forbidden_phrases || []).forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = `"${p}"`;
+      fl.appendChild(li);
+    });
+
+    // Highlight matching mode card
+    document.querySelectorAll('.mode-card').forEach(c => {
+      c.classList.toggle('highlighted', c.dataset.mode === d.detected_mode);
+    });
+
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function copyMessage() {
+    const text = document.getElementById('r-message').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }
+
+  // Load modes grid
+  async function loadModes() {
+    try {
+      const res = await fetch('/modes');
+      const modes = await res.json();
+      const grid = document.getElementById('modes-grid');
+      grid.innerHTML = '';
+      for (const [key, m] of Object.entries(modes)) {
+        const card = document.createElement('div');
+        card.className = 'mode-card';
+        card.dataset.mode = key;
+        card.innerHTML = `
+          <div class="mode-name">${key}</div>
+          <div class="mode-who">${m.who}</div>
+          <div class="mode-desc">${m.description}</div>
+        `;
+        grid.appendChild(card);
+      }
+    } catch (e) {
+      console.error('Failed to load modes', e);
+    }
+  }
+
+  loadModes();
+</script>
+</body>
+</html>
