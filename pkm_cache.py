@@ -92,3 +92,97 @@ def _increment_hit(record_id: str, current: int):
         )
     except Exception:
         pass
+
+
+def _feedback_url():
+    api_key, base_id, _ = _get_config()
+    return f"{AIRTABLE_URL}/{base_id}/PKM_Feedback"
+
+
+def store_feedback(
+    cache_key: str,
+    detected_mode: str,
+    rating: str,
+    correct_mode: str = "",
+    profile_preview: str = "",
+):
+    body = {
+        "fields": {
+            "cache_key": cache_key,
+            "detected_mode": detected_mode,
+            "correct_mode": correct_mode,
+            "rating": rating,
+            "profile_preview": profile_preview[:200],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+    }
+    try:
+        r = requests.post(_feedback_url(), headers=_headers(), json=body, timeout=10)
+        r.raise_for_status()
+    except Exception:
+        pass
+
+
+def get_correction_patterns() -> list:
+    """Fetch recent corrections (thumbs down + correct_mode provided) to inject into prompts."""
+    try:
+        r = requests.get(
+            _feedback_url(),
+            headers=_headers(),
+            params={
+                "filterByFormula": 'AND({rating}="down",{correct_mode}!="")',
+                "sort[0][field]": "created_at",
+                "sort[0][direction]": "desc",
+                "maxRecords": 50,
+            },
+            timeout=10,
+        )
+        r.raise_for_status()
+        records = r.json().get("records", [])
+        return [
+            {
+                "profile": r["fields"].get("profile_preview", ""),
+                "detected_as": r["fields"].get("detected_mode", ""),
+                "actually_was": r["fields"].get("correct_mode", ""),
+            }
+            for r in records
+            if r["fields"].get("correct_mode")
+        ]
+    except Exception:
+        return []
+
+
+def get_stats() -> dict:
+    """Get aggregate stats: total analyses, per-mode counts, accuracy from feedback."""
+    stats = {"total_analyses": 0, "total_feedback": 0, "modes": {}, "accuracy": 0}
+    try:
+        # Count total analyses
+        r = requests.get(
+            _table_url(),
+            headers=_headers(),
+            params={"fields[]": "detected_mode", "pageSize": 100},
+            timeout=10,
+        )
+        r.raise_for_status()
+        records = r.json().get("records", [])
+        stats["total_analyses"] = len(records)
+        for rec in records:
+            mode = rec["fields"].get("detected_mode", "UNKNOWN")
+            stats["modes"][mode] = stats["modes"].get(mode, 0) + 1
+
+        # Count feedback
+        r2 = requests.get(
+            _feedback_url(),
+            headers=_headers(),
+            params={"fields[]": ["rating", "correct_mode"], "pageSize": 100},
+            timeout=10,
+        )
+        r2.raise_for_status()
+        fb = r2.json().get("records", [])
+        stats["total_feedback"] = len(fb)
+        ups = sum(1 for f in fb if f["fields"].get("rating") == "up")
+        if fb:
+            stats["accuracy"] = round(ups / len(fb) * 100)
+    except Exception:
+        pass
+    return stats

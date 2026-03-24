@@ -8,8 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import Optional
 
-from pkm_cache import get_cached, make_cache_key, store_result
+from pkm_cache import (
+    get_cached, make_cache_key, store_result,
+    store_feedback, get_correction_patterns, get_stats,
+)
 from pkm_engine import DEFENSE_MODES, analyze
 
 load_dotenv()
@@ -24,12 +28,17 @@ app.add_middleware(
 )
 
 
-from typing import Optional
-
-
 class AnalyzeRequest(BaseModel):
     text: Optional[str] = None
     url: Optional[str] = None
+
+
+class FeedbackRequest(BaseModel):
+    cache_key: str
+    detected_mode: str
+    rating: str  # "up" or "down"
+    correct_mode: Optional[str] = None
+    profile_preview: Optional[str] = None
 
 
 def fetch_netrows(linkedin_url: str) -> str:
@@ -108,8 +117,11 @@ async def analyze_endpoint(req: AnalyzeRequest):
             "from_cache": True,
         }
 
-    # Fresh analysis
-    result = analyze(profile_text)
+    # Get learned corrections to inject into prompt
+    corrections = get_correction_patterns()
+
+    # Fresh analysis with dynamic prompt
+    result = analyze(profile_text, corrections=corrections)
 
     # Store in Airtable
     try:
@@ -118,6 +130,23 @@ async def analyze_endpoint(req: AnalyzeRequest):
         pass
 
     return {**result, "from_cache": False}
+
+
+@app.post("/feedback")
+async def feedback_endpoint(req: FeedbackRequest):
+    store_feedback(
+        cache_key=req.cache_key,
+        detected_mode=req.detected_mode,
+        rating=req.rating,
+        correct_mode=req.correct_mode or "",
+        profile_preview=req.profile_preview or "",
+    )
+    return {"status": "ok"}
+
+
+@app.get("/stats")
+async def stats_endpoint():
+    return get_stats()
 
 
 @app.get("/modes")

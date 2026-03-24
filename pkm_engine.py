@@ -111,14 +111,33 @@ Code: github.com/originaonxi/aros-agent
 Return the message only. No JSON. No quotes."""
 
 
-def analyze(profile_text: str) -> dict:
+def _build_dynamic_prompt(corrections: list) -> str:
+    """Inject correction patterns from real user feedback into classification prompt."""
+    if not corrections:
+        return CLASSIFICATION_SYSTEM
+
+    correction_block = "\n\nLEARNED CORRECTIONS FROM REAL USAGE (use these to improve accuracy):\n"
+    for c in corrections[:20]:
+        correction_block += (
+            f'- Profile like "{c["profile"][:80]}..." was detected as {c["detected_as"]} '
+            f'but was actually {c["actually_was"]}\n'
+        )
+    correction_block += "\nApply these patterns when you see similar profiles."
+
+    return CLASSIFICATION_SYSTEM + correction_block
+
+
+def analyze(profile_text: str, corrections: list = None) -> dict:
     client = anthropic.Anthropic()
+
+    # Build prompt with learned corrections
+    system_prompt = _build_dynamic_prompt(corrections or [])
 
     # Step 1: Classify
     classification_response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=300,
-        system=CLASSIFICATION_SYSTEM,
+        system=system_prompt,
         messages=[{"role": "user", "content": f"Profile:\n{profile_text}"}],
     )
 
