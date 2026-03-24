@@ -1,123 +1,204 @@
 # PKM Analyzer
 
-**Detect how people defend against persuasion. Generate messages that bypass those defenses.**
+**The persuasion layer for autonomous agents. Profile anyone's digital presence. Detect how they defend against outreach. Generate messages that don't get deleted.**
 
-[![Live App](https://img.shields.io/badge/Live_App-GitHub_Pages-blue?style=for-the-badge)](https://originaonxi.github.io/pkm-analyzer/)
+[![Live App](https://img.shields.io/badge/Try_it_live-PKM_Analyzer-blue?style=for-the-badge)](https://originaonxi.github.io/pkm-analyzer/)
+[![API](https://img.shields.io/badge/API-Render-46E3B7?style=for-the-badge)](https://pkm-analyzer.onrender.com/modes)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Built with Claude](https://img.shields.io/badge/Built_with-Claude_Haiku-orange?style=for-the-badge)](https://anthropic.com)
+[![Built with Claude](https://img.shields.io/badge/Claude_Haiku-Anthropic-orange?style=for-the-badge)](https://anthropic.com)
 
-**[Try it live](https://originaonxi.github.io/pkm-analyzer/)** — no install, no backend, runs entirely in your browser.
+**[Try it free](https://originaonxi.github.io/pkm-analyzer/)** — no API key, no install, no sign-up. Paste a profile, get the defense mode.
 
 ---
 
-## Why this exists
+## Why PKM matters for AGI agents
 
-Every sales tool optimizes for volume. Send more emails. Automate more sequences. Personalize at scale.
+Every AI agent that talks to humans has the same problem: **people have defenses.**
 
-None of them ask the only question that matters: **how does this specific person defend against being sold to?**
+A VC who spent 10 years at Gong reads your email differently than a home care owner in Ohio. The VC detects your selling intent before finishing the first sentence. The home care owner doesn't distrust you — they're just drowning in 60 vendor pitches a week and anything over 3 sentences gets archived.
 
-In 1994, Marian Friestad and Peter Wright published the [Persuasion Knowledge Model](https://doi.org/10.1086/209380) — a framework explaining how people develop defenses against persuasion attempts. Three decades of behavioral research followed. The sales industry ignored all of it.
+Same product. Same traction. Completely different resistance patterns. If your agent sends the same message to both, it fails on both.
 
-PKM Analyzer operationalizes that research. It classifies any prospect into one of 10 empirically-derived defense modes, then generates outreach that doesn't trigger that defense.
+In 1994, psychologists Marian Friestad and Peter Wright published the **[Persuasion Knowledge Model](https://doi.org/10.1086/209380)** — a framework explaining how people develop, activate, and deploy defenses against persuasion attempts. Three decades of behavioral research followed. The entire sales industry ignored it. They optimized for volume instead of understanding.
+
+**PKM Analyzer operationalizes that research for machines.** It gives any AI agent the ability to read a person's digital profile — their role, their background, their company, their experience — and understand *how that person will resist* before generating a single word.
+
+This is not personalization. Personalization is "Hey {first_name}, I saw you work at {company}." That's string interpolation.
+
+This is **defense-mode classification** — understanding that a bootstrapped founder who built everything themselves will hear "let us automate that" as "you're not good enough," and writing around it.
 
 ## How it works
 
-1. **Paste** any text about a prospect — LinkedIn bio, headline, job title, or a paragraph describing them
-2. **Classify** — Claude Haiku analyzes the text and maps the person to one of 10 defense modes
-3. **Bypass** — a second Claude call generates a cold message using the mode-specific bypass strategy
+```
+Profile text or LinkedIn URL
+         |
+         v
+   ┌─────────────────────────────────┐
+   │  Airtable PKM_Cache             │
+   │  (check if analyzed before)      │
+   ├──────┬──────────────────────────┤
+   │ HIT  │         MISS             │
+   │      │          |               │
+   │      │    Claude Haiku           │
+   │      │    Classify → 1 of 10    │
+   │      │    defense modes          │
+   │      │          |               │
+   │      │    Claude Haiku           │
+   │      │    Generate bypass msg    │
+   │      │          |               │
+   │      │    Store in Airtable      │
+   └──┬───┴──────────┬───────────────┘
+      │              │
+      v              v
+   Return result (cached or fresh)
+```
 
-Two API calls. ~3 seconds. ~$0.001 per analysis.
+**Cache hit:** instant, $0, no API calls.
+**Cache miss:** ~3 seconds, ~$0.001, stored forever.
 
-Your Anthropic API key stays in your browser's localStorage. Never touches a server.
+Every profile analyzed once is cached permanently. The system gets cheaper over time.
 
 ## The 10 defense modes
 
-| # | Mode | Who | Defense trigger |
-|---|------|-----|-----------------|
-| 1 | **MOTIVE_INFERENCE** | VCs, ex-GTM execs (Gong, HubSpot, Salesforce) | Decodes your intent before reading your words |
-| 2 | **TACTIC_RECOGNITION** | Repeat founders, serial operators | Pattern-matches your tactic in the first sentence |
-| 3 | **OVERLOAD_AVOIDANCE** | SMB CEOs, operators wearing 5 hats | Anything that looks like effort gets archived |
-| 4 | **SOCIAL_PROOF_SKEPTICISM** | CTOs, engineers, technical leads | Name-dropping triggers distrust |
-| 5 | **AUTHORITY_DEFERENCE** | Directors, VPs, mid-level managers | Won't act without cover from above |
-| 6 | **LOSS_AVERSION** | Risk-aware buyers, regulated industries | Fear of loss > desire for gain |
-| 7 | **IDENTITY_THREAT** | Self-made founders, bootstrapped builders | Your pitch implies they need help |
-| 8 | **TIMING_SKEPTICISM** | Perpetually "not ready" buyers | Timing is their permanent objection |
-| 9 | **COMPLEXITY_FEAR** | Non-technical owners, first-time founders | Complexity = risk in their mind |
-| 10 | **PRICE_ANCHORING** | Budget-constrained buyers, procurement | Anchor to the cheapest alternative |
+| # | Mode | Who | How they defend | Bypass strategy |
+|---|------|-----|-----------------|-----------------|
+| 1 | **MOTIVE_INFERENCE** | VCs, ex-GTM execs (Gong, HubSpot, Salesforce) | Decode your intent before reading your words | **PURE_DATA** — lead with a number, never open with "I" |
+| 2 | **TACTIC_RECOGNITION** | Repeat founders, serial operators | Pattern-match your tactic in sentence one | **SIGNAL_HOOK** — reference specific public activity, prove research is real |
+| 3 | **OVERLOAD_AVOIDANCE** | SMB CEOs, operators wearing 5 hats | Archive anything that looks like effort | **ULTRA_SHORT** — under 60 words, one specific calendar slot |
+| 4 | **SOCIAL_PROOF_SKEPTICISM** | CTOs, engineers, technical leads | Name-dropping triggers distrust | **CREDIBILITY_FIRST** — exact numbers, public verifiable proof |
+| 5 | **AUTHORITY_DEFERENCE** | Directors, VPs, mid-level managers | Won't act without cover from above | **PEER_PROOF** — name peers who use it, give ammo to forward up |
+| 6 | **LOSS_AVERSION** | Risk-aware buyers, regulated industries | Fear of loss > desire for gain | **COST_OF_INACTION** — frame what they lose by NOT acting |
+| 7 | **IDENTITY_THREAT** | Self-made founders, bootstrapped builders | Your pitch implies they need help | **AMPLIFICATION** — they run the system, they're still the decision maker |
+| 8 | **TIMING_SKEPTICISM** | Perpetually "not ready" buyers | Timing is their permanent objection | **TRIGGER_EVENT** — name a specific reason NOW is different |
+| 9 | **COMPLEXITY_FEAR** | Non-technical owners, first-time founders | Complexity = risk in their mind | **SIMPLICITY_PROOF** — show the one action needed, nothing else |
+| 10 | **PRICE_ANCHORING** | Budget-constrained buyers, procurement | Anchor to the cheapest alternative | **ROI_INVERSION** — cost per outcome, not cost per month |
 
-Each mode has a specific **bypass strategy**, a set of **forbidden phrases** that trigger the defense, and a **message generation template** tuned to that mode.
+Each mode includes **forbidden phrases** — words and patterns that activate the defense. The agent never uses them.
 
-## How AROS and ARIA use PKM
+## Why this matters for AROS and ARIA
 
-This isn't a standalone experiment. PKM is the persuasion layer inside two production systems at [Aonxi](https://github.com/originaonxi):
+PKM Analyzer is not a standalone tool. It is the **perception layer** of the Aonxi autonomous agent stack — the system that reads humans before any agent talks to them.
 
-### AROS (Autonomous Revenue Operating System)
-AROS runs customer outreach end-to-end. When AROS identifies a lead, PKM classifies their defense mode before any message is sent. Every cold email, follow-up, and re-engagement is generated through the mode-specific bypass strategy. This is why AROS hit **$199K collected**, **$8K peak day**, and **$2.9M ARR velocity** — it never triggers the defense that makes people delete.
-
-### ARIA (Autonomous Revenue Intelligence Agent)
-ARIA handles investor outreach. VCs are the hardest defense mode to bypass (MOTIVE_INFERENCE — they literally decode persuasion for a living). ARIA uses PKM to generate investor messages that lead with data, not pitch language. No "excited to share," no "love to connect." Just numbers.
-
-### This tool
-PKM Analyzer exposes the same engine publicly. Open-source the classification. Let anyone see how it works. The competitive advantage isn't the model — it's the system that acts on it.
-
-## Architecture
+### The Aonxi agent architecture
 
 ```
-Browser (index.html)
-  │
-  ├── localStorage: API key + feedback data
-  │
-  ├── Call 1: Claude Haiku → classify defense mode
-  │     System prompt: PKM classification (10 modes)
-  │     Returns: {mode, confidence, reasoning, awareness_score}
-  │
-  └── Call 2: Claude Haiku → generate bypass message
-        System prompt: mode-specific bypass strategy
-        Returns: plain text message (<80 words)
+                    ┌─────────────────────────────────┐
+                    │         PKM Analyzer             │
+                    │   (defense mode classification)  │
+                    │   10 modes × bypass strategies   │
+                    │   Airtable cache (permanent)     │
+                    └────────┬──────────┬──────────────┘
+                             │          │
+                    ┌────────┴──┐  ┌────┴────────────┐
+                    │   AROS    │  │      ARIA        │
+                    │  Revenue  │  │   Fundraising    │
+                    │   Agent   │  │     Agent        │
+                    └───────────┘  └──────────────────┘
+                             │          │
+                    ┌────────┴──────────┴──────────────┐
+                    │          Airtable                 │
+                    │   (single source of truth)        │
+                    │   Every contact, every message,   │
+                    │   every outcome, every score      │
+                    └──────────────────────────────────┘
 ```
 
-No backend. No database. No server costs. Single HTML file.
+### [AROS](https://github.com/originaonxi/aros-agent) — Autonomous Revenue Operating System
 
-Shareable results via URL hash encoding — send anyone a link to see the analysis.
+AROS finds customers, scores them, researches their real-time signals (hiring, struggling, expanding), and sends cold emails. Before PKM, it used the same tone for everyone. Now:
+
+- A **CTO** gets SOCIAL_PROOF_SKEPTICISM bypass — exact numbers, verifiable claims, no "trusted by" language
+- A **busy SMB owner** gets OVERLOAD_AVOIDANCE bypass — under 60 words, one calendar slot, zero fluff
+- A **bootstrapped founder** gets IDENTITY_THREAT bypass — "your judgment runs this" framing, never "let us fix"
+
+**Result:** $199K collected. $8K peak day. $2.9M ARR velocity. $0.50/day to run.
+
+### [ARIA](https://github.com/originaonxi/ARIA) — Autonomous Relationship Intelligence Agent
+
+ARIA raises money. It finds investors, verifies emails, scores by thesis fit, researches public activity, writes cold emails, sends via Instantly, classifies replies, and prepares for meetings. VCs are the hardest defense mode:
+
+- **MOTIVE_INFERENCE** — they decode persuasion for a living
+- ARIA bypasses with PURE_DATA — opens with a number, never with "I'm excited to"
+- Every message is under 100 words with zero banned phrases
+
+**Status:** 19 investor emails sent. $250K pre-seed raise. General Catalyst, Bessemer, Antler, Blume, Kae Capital.
+
+### The vision: two super-agents, everything else feeds in
+
+AROS and ARIA are the two permanent agents. Every new capability — PKM analysis, LinkedIn scraping, email verification, signal detection, reply classification — plugs into one of them. They are the brains. Airtable is the memory. Every contact ever analyzed, every message ever sent, every response ever received — stored permanently, deduplicated, scored.
+
+New agents don't create new databases. They write to the same Airtable. New capabilities don't create new workflows. They become modules inside AROS (revenue) or ARIA (fundraising).
+
+PKM Analyzer is the first module built as a standalone tool that feeds both.
+
+## Production stack
+
+| Layer | Service | Cost |
+|-------|---------|------|
+| **Frontend** | [GitHub Pages](https://originaonxi.github.io/pkm-analyzer/) | Free |
+| **API** | [Render](https://pkm-analyzer.onrender.com) (FastAPI) | Free tier |
+| **Classification** | Claude Haiku (Anthropic) | ~$0.001/analysis |
+| **LinkedIn fetch** | Netrows API | Per-call |
+| **Cache/storage** | Airtable (PKM_Cache table) | Free tier |
+
+Users pay nothing. The backend handles all API calls. Results are cached permanently — the same profile never costs twice.
+
+## API
+
+**POST /analyze**
+```json
+{"text": "Sarah Chen, Partner at Bessemer, previously VP Sales at Gong"}
+```
+or
+```json
+{"url": "https://linkedin.com/in/username"}
+```
+
+**Response:**
+```json
+{
+  "detected_mode": "MOTIVE_INFERENCE",
+  "label": "Motive Inference",
+  "confidence": 92,
+  "reasoning": "Ex-GTM exec from Gong now in VC — decodes persuasion tactics instinctively",
+  "awareness_score": 9,
+  "bypass_strategy": "Lead with transparent motive. No disguised pitches.",
+  "forbidden_phrases": ["I'd love to pick your brain", "Quick question", "No agenda"],
+  "who_they_are": "VCs, ex-GTM execs",
+  "generated_message": "...",
+  "from_cache": true
+}
+```
+
+**GET /modes** — returns all 10 defense modes with descriptions and bypass strategies.
+
+**GET /health** — service health check.
 
 ## Run locally
 
 ```bash
 git clone https://github.com/originaonxi/pkm-analyzer.git
-open pkm-analyzer/static/index.html
-```
-
-That's it. Enter your Anthropic API key when prompted.
-
-### Optional: Run with the FastAPI backend
-
-```bash
+cd pkm-analyzer
 pip install -r requirements.txt
 cp .env.example .env
-# Add your ANTHROPIC_API_KEY to .env
+# Add your keys to .env
 uvicorn app:app --reload
 ```
-
-The backend provides a REST API at `http://localhost:8000` if you want to integrate PKM into other systems.
-
-**POST /analyze**
-```json
-{"text": "VP Engineering at Stripe, previously Staff at Google, built internal ML platform"}
-```
-
-**GET /modes**
-Returns all 10 defense modes with descriptions and bypass strategies.
 
 ## The research
 
 - Friestad, M., & Wright, P. (1994). *The Persuasion Knowledge Model: How people cope with persuasion attempts.* Journal of Consumer Research, 21(1), 1-31. [DOI](https://doi.org/10.1086/209380)
 - Campbell, M. C., & Kirmani, A. (2000). *Consumers' use of persuasion knowledge.* Journal of Consumer Research, 27(1), 69-83.
 - Ham, C. D., Nelson, M. R., & Das, S. (2015). *How to measure persuasion knowledge.* International Journal of Advertising, 34(1), 17-53.
+- Kirmani, A., & Zhu, R. (2007). *Vigilant against manipulation: The effect of regulatory focus on the use of persuasion knowledge.* Journal of Marketing Research, 44(4), 688-701.
 
-PKM Analyzer maps these theoretical constructs to practical outreach categories. The 10 modes are derived from the interaction between **agent knowledge** (what the target knows about persuasion tactics), **topic knowledge** (domain expertise), and **persuasion knowledge** (awareness of being persuaded).
+The 10 defense modes are derived from the interaction between three knowledge structures in Friestad & Wright's model: **agent knowledge** (what the target knows about persuasion tactics), **topic knowledge** (domain expertise), and **persuasion knowledge** (awareness of being persuaded). PKM Analyzer maps these theoretical constructs to observable signals in digital profiles — job titles, company backgrounds, career trajectories — and classifies the dominant defense pattern.
 
 ---
 
-**Built by [Anmol Sam](https://github.com/originaonxi)** — Aonxi
+**Built by [Anmol Sam](https://github.com/originaonxi)** — CTO, Aonxi
 
-$0.50/day to run the entire revenue stack. Code: [github.com/originaonxi/aros-agent](https://github.com/originaonxi/aros-agent)
+AROS: [github.com/originaonxi/aros-agent](https://github.com/originaonxi/aros-agent)
+ARIA: [github.com/originaonxi/ARIA](https://github.com/originaonxi/ARIA)
+
+$0.50/day to run the entire autonomous revenue stack.
