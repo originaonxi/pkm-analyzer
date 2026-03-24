@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PKM Analyzer — Defense Mode Detection</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f0f;color:#e0e0e0;min-height:100vh;line-height:1.5}
+a{color:#888;text-decoration:none}a:hover{color:#ccc}
+
+.container{max-width:800px;margin:0 auto;padding:40px 24px 60px}
+
+.header{margin-bottom:32px}
+.header h1{font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.header p{color:#666;font-size:0.88rem;margin-top:4px}
+
+.input-section{margin-bottom:32px}
+.toggle-bar{display:flex;gap:0;margin-bottom:14px;background:#1a1a1a;border-radius:8px;overflow:hidden;border:1px solid #2a2a2a}
+.toggle-btn{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:0.85rem;font-weight:500;color:#666;transition:all 0.2s;border:none;background:none}
+.toggle-btn.active{background:#2a2a2a;color:#fff}
+
+.input-section textarea{width:100%;height:130px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px;color:#e0e0e0;font-size:0.9rem;font-family:inherit;resize:vertical;line-height:1.5}
+.input-section textarea:focus{outline:none;border-color:#444}
+.input-section textarea::placeholder{color:#555;line-height:1.5}
+
+.url-input-wrap{display:none}
+.url-field{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px;color:#e0e0e0;font-size:0.9rem;font-family:inherit}
+.url-field:focus{outline:none;border-color:#444}
+.url-field::placeholder{color:#555}
+.url-note{color:#666;font-size:0.78rem;margin-top:6px}
+
+.input-row{display:flex;align-items:center;gap:12px;margin-top:12px}
+.analyze-btn{background:#fff;color:#000;border:none;border-radius:8px;padding:14px 32px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+.analyze-btn:hover{opacity:0.85}
+.analyze-btn:disabled{opacity:0.35;cursor:not-allowed}
+.input-hint{color:#555;font-size:0.78rem}
+.error-msg{color:#ef4444;font-size:0.85rem;margin-top:10px}
+.status-msg{color:#60a5fa;font-size:0.85rem;margin-top:10px;display:none}
+
+.modes-section{margin-bottom:32px}
+.modes-section h2{font-size:1rem;color:#888;margin-bottom:14px;font-weight:500}
+.modes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-card{background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:14px 16px;transition:all 0.3s}
+.mode-card .mc-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.mode-card .mc-num{font-size:0.7rem;font-weight:700;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#000;flex-shrink:0}
+.mode-card .mc-name{font-size:0.82rem;font-weight:600;color:#ccc;letter-spacing:0.3px}
+.mode-card .mc-who{font-size:0.75rem;color:#666;margin-left:28px}
+.mode-card.highlighted{background:#222;transform:scale(1.02)}
+.mode-card.highlighted .mc-name{color:#fff}
+
+.result-section{display:none;margin-bottom:32px}
+.result-section.visible{display:block}
+
+.cache-badge{display:inline-block;padding:3px 10px;border-radius:5px;font-size:0.72rem;font-weight:600;margin-bottom:12px;letter-spacing:0.3px}
+.cache-badge.cached{background:#064e3b;color:#6ee7b7;border:1px solid #065f46}
+.cache-badge.fresh{background:#1e293b;color:#93c5fd;border:1px solid #334155}
+
+.result-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px}
+.result-mode{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.result-mode-badge{padding:8px 18px;border-radius:8px;font-weight:700;font-size:0.88rem;color:#000;letter-spacing:0.3px}
+.result-mode-label{font-size:1rem;color:#fff;font-weight:600}
+.result-conf{font-size:0.82rem;color:#888}
+
+.result-row{margin-bottom:14px}
+.result-row-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:6px;font-weight:600}
+.result-row-value{font-size:0.88rem;color:#ccc;line-height:1.5}
+
+.awareness-bar-track{width:100%;height:8px;background:#2a2a2a;border-radius:4px;overflow:hidden;margin-top:6px}
+.awareness-bar-fill{height:100%;border-radius:4px;transition:width 0.5s}
+
+.bypass-pill{display:inline-block;background:#1e293b;border:1px solid #334155;color:#93c5fd;padding:4px 14px;border-radius:6px;font-size:0.82rem;font-weight:500}
+
+.forbidden-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.forbidden-pill{background:#1c0808;border:1px solid #3a1212;color:#f87171;padding:3px 10px;border-radius:5px;font-size:0.78rem}
+
+.message-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px;position:relative}
+.message-card .mc-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:12px;font-weight:600}
+.message-text{font-size:0.95rem;color:#fff;line-height:1.7;white-space:pre-wrap}
+.msg-actions{display:flex;gap:8px;margin-top:16px}
+.msg-btn{background:#222;border:1px solid #333;color:#aaa;padding:8px 16px;border-radius:7px;cursor:pointer;font-size:0.82rem;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.msg-btn:hover{background:#333;color:#fff}
+.msg-btn.active-up{background:#064e3b;border-color:#065f46;color:#6ee7b7}
+.msg-btn.active-down{background:#450a0a;border-color:#7f1d1d;color:#fca5a5}
+
+.feedback-dropdown{margin-top:12px;display:none}
+.feedback-dropdown.visible{display:block}
+.feedback-dropdown select{background:#0f0f0f;border:1px solid #333;border-radius:6px;padding:8px 12px;color:#e0e0e0;font-size:0.85rem;width:100%}
+.feedback-dropdown select:focus{outline:none;border-color:#555}
+.fb-note{color:#555;font-size:0.75rem;margin-top:6px}
+
+.footer{border-top:1px solid #1a1a1a;padding-top:24px;margin-top:40px;text-align:center}
+.footer p{color:#444;font-size:0.78rem;line-height:1.8}
+.footer a{color:#666}
+
+.loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+@media(max-width:600px){
+  .modes-grid{grid-template-columns:1fr}
+  .msg-actions{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>PKM Analyzer</h1>
+    <p>Detect defense modes. Generate bypass messages. Free to use — no API key needed.</p>
+  </div>
+
+  <div class="input-section" id="input-section">
+    <div class="toggle-bar">
+      <button class="toggle-btn active" id="toggle-text" onclick="setInputMode('text')">Paste Text</button>
+      <button class="toggle-btn" id="toggle-url" onclick="setInputMode('url')">LinkedIn URL</button>
+    </div>
+
+    <div id="text-input-wrap">
+      <textarea id="profile-input" placeholder="Paste anything about your prospect:&#10;LinkedIn bio, headline, job title, company name, or just their role.&#10;&#10;Example: Sarah Chen, Partner at Bessemer,&#10;previously VP Sales at Gong, angel investor"></textarea>
+    </div>
+
+    <div class="url-input-wrap" id="url-input-wrap">
+      <input class="url-field" id="url-input" type="url" placeholder="https://linkedin.com/in/username">
+      <p class="url-note">Profile fetched automatically — no login required.</p>
+    </div>
+
+    <div class="input-row">
+      <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">Analyze defense mode</button>
+      <span class="input-hint">Free — takes ~3 seconds</span>
+    </div>
+    <p class="status-msg" id="status-msg"></p>
+    <p class="error-msg" id="error-msg"></p>
+  </div>
+
+  <div class="modes-section">
+    <h2>The 10 defense modes</h2>
+    <div class="modes-grid" id="modes-grid"></div>
+  </div>
+
+  <div class="result-section" id="result-section">
+    <span class="cache-badge" id="cache-badge"></span>
+
+    <div class="result-card">
+      <div class="result-mode">
+        <span class="result-mode-badge" id="r-badge"></span>
+        <div>
+          <div class="result-mode-label" id="r-label"></div>
+          <div class="result-conf" id="r-conf"></div>
+        </div>
+      </div>
+      <div class="result-row">
+        <div class="result-row-label">Why this mode</div>
+        <div class="result-row-value" id="r-reasoning"></div>
+      </div>
+      <div class="result-row">
+        <div class="result-row-label">Awareness score</div>
+        <div class="result-row-value" id="r-awareness-text"></div>
+        <div class="awareness-bar-track"><div class="awareness-bar-fill" id="r-awareness-bar"></div></div>
+      </div>
+      <div class="result-row">
+        <div class="result-row-label">Bypass strategy</div>
+        <div class="result-row-value"><span class="bypass-pill" id="r-strategy"></span></div>
+      </div>
+      <div class="result-row">
+        <div class="result-row-label">Forbidden phrases</div>
+        <div class="forbidden-list" id="r-forbidden"></div>
+      </div>
+    </div>
+
+    <div class="message-card">
+      <div class="mc-label">Generated bypass message</div>
+      <div class="message-text" id="r-message"></div>
+      <div class="msg-actions">
+        <button class="msg-btn" id="copy-btn" onclick="copyMessage()">Copy</button>
+        <button class="msg-btn" id="share-btn" onclick="shareResult()">Share</button>
+        <button class="msg-btn" id="up-btn" onclick="rateFeedback('up')">&#9650; Good</button>
+        <button class="msg-btn" id="down-btn" onclick="rateFeedback('down')">&#9660; Bad</button>
+      </div>
+      <div class="feedback-dropdown" id="feedback-dropdown">
+        <select id="correct-mode" onchange="saveCorrection()">
+          <option value="">What was the actual mode?</option>
+        </select>
+        <p class="fb-note">Feedback helps improve results.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Built by Anmol Sam — <a href="https://github.com/originaonxi" target="_blank">Aonxi</a></p>
+    <p><a href="https://github.com/originaonxi/pkm-analyzer" target="_blank">github.com/originaonxi/pkm-analyzer</a></p>
+    <p>Part of AROS and ARIA — autonomous revenue infrastructure</p>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `${window.location.protocol}//${window.location.host}`
+  : 'https://pkm-analyzer.onrender.com';
+
+const MODES = [
+  {key:'MOTIVE_INFERENCE',label:'Motive Inference',who:'VCs, ex-GTM execs',color:'#a78bfa',bypass:'PURE_DATA',forbidden:['excited','reach out','love to','synergy','opportunity','quick call','touching base']},
+  {key:'TACTIC_RECOGNITION',label:'Tactic Recognition',who:'Repeat founders',color:'#fb7185',bypass:'SIGNAL_HOOK',forbidden:['I noticed','I came across','fellow founder','relevant to your work','your impressive']},
+  {key:'OVERLOAD_AVOIDANCE',label:'Overload Avoidance',who:'Busy SMB operators',color:'#2dd4bf',bypass:'ULTRA_SHORT',forbidden:['just wanted to','hope this finds you','when you get a chance','at your convenience']},
+  {key:'SOCIAL_PROOF_SKEPTICISM',label:'Social Proof Skepticism',who:'CTOs, engineers',color:'#60a5fa',bypass:'CREDIBILITY_FIRST',forbidden:['industry-leading','best-in-class','proven','trusted by','world-class']},
+  {key:'AUTHORITY_DEFERENCE',label:'Authority Deference',who:'Mid-level managers',color:'#fbbf24',bypass:'PEER_PROOF',forbidden:['decision maker','whoever handles this']},
+  {key:'LOSS_AVERSION',label:'Loss Aversion',who:'Risk-aware buyers',color:'#f472b6',bypass:'COST_OF_INACTION',forbidden:['opportunity','upside','potential','imagine']},
+  {key:'IDENTITY_THREAT',label:'Identity Threat',who:'Proud operators',color:'#4ade80',bypass:'AMPLIFICATION',forbidden:['replace','automate away','eliminate']},
+  {key:'TIMING_SKEPTICISM',label:'Timing Skepticism',who:'Perpetual "not ready"',color:'#9ca3af',bypass:'TRIGGER_EVENT',forbidden:['whenever ready','no rush','at some point']},
+  {key:'COMPLEXITY_FEAR',label:'Complexity Fear',who:'Non-technical owners',color:'#f87171',bypass:'SIMPLICITY_PROOF',forbidden:['API','integrate','configure','tech stack']},
+  {key:'PRICE_ANCHORING',label:'Price Anchoring',who:'Budget buyers',color:'#38bdf8',bypass:'ROI_INVERSION',forbidden:['affordable','cheap','free trial','flexible pricing']},
+];
+
+let currentResult = null;
+let inputMode = 'text';
+
+function init() {
+  renderModes();
+  const sel = document.getElementById('correct-mode');
+  MODES.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.key;
+    opt.textContent = `${m.key} — ${m.who}`;
+    sel.appendChild(opt);
+  });
+  if (window.location.hash && window.location.hash.length > 1) {
+    try {
+      const shared = JSON.parse(atob(window.location.hash.slice(1)));
+      if (shared.mode) showSharedResult(shared);
+    } catch(e) {}
+  }
+}
+
+function setInputMode(mode) {
+  inputMode = mode;
+  document.getElementById('toggle-text').classList.toggle('active', mode === 'text');
+  document.getElementById('toggle-url').classList.toggle('active', mode === 'url');
+  document.getElementById('text-input-wrap').style.display = mode === 'text' ? 'block' : 'none';
+  document.getElementById('url-input-wrap').style.display = mode === 'url' ? 'block' : 'none';
+}
+
+function renderModes() {
+  const grid = document.getElementById('modes-grid');
+  MODES.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.className = 'mode-card';
+    card.id = `mode-${m.key}`;
+    card.innerHTML = `<div class="mc-top"><span class="mc-num" style="background:${m.color}">${i+1}</span><span class="mc-name">${m.key}</span></div><div class="mc-who">${m.who}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+async function runAnalysis() {
+  const btn = document.getElementById('analyze-btn');
+  const errEl = document.getElementById('error-msg');
+  const statusEl = document.getElementById('status-msg');
+  errEl.textContent = '';
+  statusEl.style.display = 'none';
+
+  const body = {};
+  if (inputMode === 'url') {
+    const url = document.getElementById('url-input').value.trim();
+    if (!url) { errEl.textContent = 'Enter a LinkedIn URL.'; return; }
+    if (!url.includes('linkedin.com/in/')) { errEl.textContent = 'Enter a valid LinkedIn profile URL.'; return; }
+    body.url = url;
+  } else {
+    const text = document.getElementById('profile-input').value.trim();
+    if (!text) { errEl.textContent = 'Paste some profile text first.'; return; }
+    body.text = text;
+  }
+
+  btn.disabled = true;
+  const loadingText = inputMode === 'url' ? 'Fetching profile' : 'Analyzing defense mode';
+  btn.innerHTML = `${loadingText}<span class="loading-dots"></span>`;
+  statusEl.textContent = inputMode === 'url' ? 'Fetching LinkedIn profile and analyzing...' : 'Analyzing defense mode...';
+  statusEl.style.display = 'block';
+
+  document.querySelectorAll('.mode-card').forEach(c => { c.classList.remove('highlighted'); c.style.borderColor = ''; });
+  document.getElementById('result-section').classList.remove('visible');
+  document.getElementById('feedback-dropdown').classList.remove('visible');
+  document.getElementById('up-btn').className = 'msg-btn';
+  document.getElementById('down-btn').className = 'msg-btn';
+
+  try {
+    const res = await fetch(`${API_BASE}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.detail || `Error ${res.status}`);
+    }
+    const data = await res.json();
+    const mode = MODES.find(m => m.key === data.detected_mode) || MODES[0];
+
+    const card = document.getElementById(`mode-${mode.key}`);
+    if (card) { card.classList.add('highlighted'); card.style.borderColor = mode.color; }
+
+    currentResult = {
+      mode: mode.key, label: data.label || mode.label, color: mode.color,
+      confidence: data.confidence, reasoning: data.reasoning,
+      awareness_score: data.awareness_score, bypass: data.bypass_strategy || mode.bypass,
+      forbidden: data.forbidden_phrases || mode.forbidden,
+      who: data.who_they_are || mode.who,
+      message: data.generated_message, from_cache: data.from_cache,
+      input_preview: (body.text || body.url || '').slice(0, 120),
+    };
+    statusEl.style.display = 'none';
+    showResult(currentResult);
+  } catch (e) {
+    errEl.textContent = e.message;
+    statusEl.style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Analyze defense mode';
+  }
+}
+
+function showResult(r) {
+  const rs = document.getElementById('result-section');
+  rs.classList.add('visible');
+
+  const cb = document.getElementById('cache-badge');
+  cb.textContent = r.from_cache ? 'Served from cache — instant' : 'Fresh analysis';
+  cb.className = r.from_cache ? 'cache-badge cached' : 'cache-badge fresh';
+
+  document.getElementById('r-badge').textContent = r.mode;
+  document.getElementById('r-badge').style.background = r.color;
+  document.getElementById('r-label').textContent = r.label;
+  document.getElementById('r-conf').textContent = `${r.confidence}% confidence`;
+  document.getElementById('r-reasoning').textContent = r.reasoning;
+
+  const score = r.awareness_score;
+  const lbl = score >= 7 ? 'High awareness — tread carefully' : score >= 4 ? 'Moderate awareness — standard bypass works' : 'Low awareness — direct approach viable';
+  document.getElementById('r-awareness-text').textContent = `${score}/10 — ${lbl}`;
+  const bar = document.getElementById('r-awareness-bar');
+  bar.style.width = `${score * 10}%`;
+  bar.style.background = score >= 7 ? '#ef4444' : score >= 4 ? '#fbbf24' : '#4ade80';
+
+  document.getElementById('r-strategy').textContent = r.bypass;
+
+  const fl = document.getElementById('r-forbidden');
+  fl.innerHTML = '';
+  (r.forbidden || []).forEach(p => {
+    const span = document.createElement('span');
+    span.className = 'forbidden-pill';
+    span.textContent = `"${p}"`;
+    fl.appendChild(span);
+  });
+
+  document.getElementById('r-message').textContent = r.message;
+
+  try {
+    const encoded = btoa(JSON.stringify({
+      mode: r.mode, confidence: r.confidence, reasoning: r.reasoning,
+      awareness_score: r.awareness_score, message: r.message,
+      input_preview: r.input_preview, bypass: r.bypass,
+      forbidden: r.forbidden, who: r.who, label: r.label, color: r.color
+    }));
+    history.replaceState(null, '', '#' + encoded);
+  } catch(e) {}
+  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showSharedResult(data) {
+  const mode = MODES.find(m => m.key === data.mode);
+  if (!mode) return;
+  currentResult = {
+    mode: data.mode, label: data.label || mode.label, color: data.color || mode.color,
+    confidence: data.confidence, reasoning: data.reasoning,
+    awareness_score: data.awareness_score, bypass: data.bypass || mode.bypass,
+    forbidden: data.forbidden || mode.forbidden, who: data.who || mode.who,
+    message: data.message, input_preview: data.input_preview || '', from_cache: false,
+  };
+  const card = document.getElementById(`mode-${mode.key}`);
+  if (card) { card.classList.add('highlighted'); card.style.borderColor = mode.color; }
+  showResult(currentResult);
+}
+
+function copyMessage() {
+  navigator.clipboard.writeText(document.getElementById('r-message').textContent).then(() => {
+    const b = document.getElementById('copy-btn'); b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy', 1500);
+  });
+}
+
+function shareResult() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const b = document.getElementById('share-btn'); b.textContent = 'Link copied!'; setTimeout(() => b.textContent = 'Share', 1500);
+  });
+}
+
+function rateFeedback(dir) {
+  document.getElementById('up-btn').className = dir === 'up' ? 'msg-btn active-up' : 'msg-btn';
+  document.getElementById('down-btn').className = dir === 'down' ? 'msg-btn active-down' : 'msg-btn';
+  document.getElementById('feedback-dropdown').classList.toggle('visible', dir === 'down');
+  const ratings = JSON.parse(localStorage.getItem('pkm_ratings') || '[]');
+  ratings.push({ mode: currentResult?.mode, feedback: dir, timestamp: new Date().toISOString() });
+  localStorage.setItem('pkm_ratings', JSON.stringify(ratings));
+}
+
+function saveCorrection() {
+  const val = document.getElementById('correct-mode').value;
+  if (!val) return;
+  const corrections = JSON.parse(localStorage.getItem('pkm_corrections') || '[]');
+  corrections.push({ detected: currentResult?.mode, actual: val, timestamp: new Date().toISOString() });
+  localStorage.setItem('pkm_corrections', JSON.stringify(corrections));
+  document.getElementById('feedback-dropdown').querySelector('.fb-note').textContent = 'Correction saved. Thanks!';
+}
+
+init();
+</script>
+</body>
+</html>
