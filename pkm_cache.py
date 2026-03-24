@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import hashlib
 import json
 import os
@@ -36,7 +34,7 @@ def make_cache_key(text: str) -> str:
     return hashlib.sha256(text.lower().strip().encode()).hexdigest()[:16]
 
 
-def get_cached(cache_key: str) -> dict | None:
+def get_cached(cache_key: str) -> Optional[dict]:
     url = _table_url()
     params = {
         "filterByFormula": f'{{cache_key}}="{cache_key}"',
