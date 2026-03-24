@@ -15,27 +15,6 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 .header h1{font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:-0.5px}
 .header p{color:#666;font-size:0.88rem;margin-top:4px}
 
-/* Free trial banner */
-.free-banner{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #334155;border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.free-banner .fb-text{font-size:0.88rem;color:#94a3b8}
-.free-banner .fb-text strong{color:#fff}
-.free-banner .fb-count{background:#334155;color:#93c5fd;padding:4px 12px;border-radius:6px;font-size:0.8rem;font-weight:600;white-space:nowrap}
-
-/* Key setup */
-.key-setup{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:32px;margin-bottom:32px;display:none}
-.key-setup h2{font-size:1.1rem;color:#fff;margin-bottom:6px}
-.key-setup .ks-sub{color:#888;font-size:0.85rem;margin-bottom:20px;line-height:1.6}
-.key-group{margin-bottom:16px}
-.key-group label{display:block;font-size:0.82rem;color:#aaa;margin-bottom:6px;font-weight:500}
-.key-group .key-sub{font-size:0.75rem;color:#555;margin-top:4px}
-.key-group .key-sub a{color:#888}
-.key-input{width:100%;background:#0f0f0f;border:1px solid #333;border-radius:8px;padding:12px 14px;color:#e0e0e0;font-size:0.9rem;font-family:monospace}
-.key-input:focus{outline:none;border-color:#555}
-.key-input::placeholder{color:#444}
-.key-save-btn{background:#fff;color:#000;border:none;border-radius:8px;padding:12px 24px;font-weight:600;font-size:0.88rem;cursor:pointer;white-space:nowrap}
-.key-save-btn:hover{opacity:0.85}
-
-/* Input */
 .input-section{margin-bottom:32px}
 .toggle-bar{display:flex;gap:0;margin-bottom:14px;background:#1a1a1a;border-radius:8px;overflow:hidden;border:1px solid #2a2a2a}
 .toggle-btn{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:0.85rem;font-weight:500;color:#666;transition:all 0.2s;border:none;background:none}
@@ -50,7 +29,6 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 .url-field:focus{outline:none;border-color:#444}
 .url-field::placeholder{color:#555}
 .url-note{color:#666;font-size:0.78rem;margin-top:6px}
-.url-note.warn{color:#f59e0b}
 
 .input-row{display:flex;align-items:center;gap:12px;margin-top:12px}
 .analyze-btn{background:#fff;color:#000;border:none;border-radius:8px;padding:14px 32px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
@@ -58,9 +36,8 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 .analyze-btn:disabled{opacity:0.35;cursor:not-allowed}
 .input-hint{color:#555;font-size:0.78rem}
 .error-msg{color:#ef4444;font-size:0.85rem;margin-top:10px}
-.status-msg{color:#60a5fa;font-size:0.85rem;margin-top:10px}
+.status-msg{color:#60a5fa;font-size:0.85rem;margin-top:10px;display:none}
 
-/* Modes Grid */
 .modes-section{margin-bottom:32px}
 .modes-section h2{font-size:1rem;color:#888;margin-bottom:14px;font-weight:500}
 .modes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -72,14 +49,12 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 .mode-card.highlighted{background:#222;transform:scale(1.02)}
 .mode-card.highlighted .mc-name{color:#fff}
 
-/* Result */
 .result-section{display:none;margin-bottom:32px}
 .result-section.visible{display:block}
 
-.profile-card{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:16px;margin-bottom:16px;display:none}
-.profile-card h3{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:8px;font-weight:600}
-.profile-card .pc-name{font-size:1rem;color:#fff;font-weight:600}
-.profile-card .pc-detail{font-size:0.85rem;color:#888;margin-top:2px}
+.cache-badge{display:inline-block;padding:3px 10px;border-radius:5px;font-size:0.72rem;font-weight:600;margin-bottom:12px;letter-spacing:0.3px}
+.cache-badge.cached{background:#064e3b;color:#6ee7b7;border:1px solid #065f46}
+.cache-badge.fresh{background:#1e293b;color:#93c5fd;border:1px solid #334155}
 
 .result-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px}
 .result-mode{display:flex;align-items:center;gap:14px;margin-bottom:16px}
@@ -117,8 +92,6 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 .footer{border-top:1px solid #1a1a1a;padding-top:24px;margin-top:40px;text-align:center}
 .footer p{color:#444;font-size:0.78rem;line-height:1.8}
 .footer a{color:#666}
-.change-key{color:#555;font-size:0.75rem;cursor:pointer;border:none;background:none;margin-top:8px;text-decoration:underline}
-.change-key:hover{color:#888}
 
 .loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
@@ -126,7 +99,6 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 @media(max-width:600px){
   .modes-grid{grid-template-columns:1fr}
   .msg-actions{flex-wrap:wrap}
-  .free-banner{flex-direction:column;text-align:center}
 }
 </style>
 </head>
@@ -135,36 +107,9 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 
   <div class="header">
     <h1>PKM Analyzer</h1>
-    <p>Defense mode detection based on Friestad & Wright (1994)</p>
+    <p>Detect defense modes. Generate bypass messages. Free to use — no API key needed.</p>
   </div>
 
-  <!-- Free trial banner -->
-  <div class="free-banner" id="free-banner">
-    <div class="fb-text"><strong>1 free analysis</strong> — try it now, no API key needed. Add your own keys for unlimited use.</div>
-    <div class="fb-count" id="free-count">1 free left</div>
-  </div>
-
-  <!-- Key setup (hidden until free used or user clicks) -->
-  <div class="key-setup" id="key-setup">
-    <h2>Add your API keys for unlimited use</h2>
-    <p class="ks-sub">Keys are stored in your browser only. Never sent anywhere except directly to each API.</p>
-
-    <div class="key-group">
-      <label>Anthropic API key (required)</label>
-      <input class="key-input" id="key-input" type="password" placeholder="sk-ant-...">
-      <p class="key-sub">Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
-    </div>
-
-    <div class="key-group">
-      <label>Netrows API key (optional — for LinkedIn URL lookup)</label>
-      <input class="key-input" id="netrows-key-input" type="password" placeholder="pk_live_...">
-      <p class="key-sub">Get a key at <a href="https://netrows.com" target="_blank">netrows.com</a></p>
-    </div>
-
-    <button class="key-save-btn" onclick="saveKeys()">Save and continue</button>
-  </div>
-
-  <!-- Input -->
   <div class="input-section" id="input-section">
     <div class="toggle-bar">
       <button class="toggle-btn active" id="toggle-text" onclick="setInputMode('text')">Paste Text</button>
@@ -177,32 +122,24 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 
     <div class="url-input-wrap" id="url-input-wrap">
       <input class="url-field" id="url-input" type="url" placeholder="https://linkedin.com/in/username">
-      <p class="url-note" id="url-note">Fetches profile via Netrows API, then classifies with Claude.</p>
+      <p class="url-note">Profile fetched automatically — no login required.</p>
     </div>
 
     <div class="input-row">
       <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">Analyze defense mode</button>
-      <span class="input-hint" id="input-hint">Takes ~3 seconds</span>
+      <span class="input-hint">Free — takes ~3 seconds</span>
     </div>
-    <p class="status-msg" id="status-msg" style="display:none"></p>
+    <p class="status-msg" id="status-msg"></p>
     <p class="error-msg" id="error-msg"></p>
   </div>
 
-  <!-- Modes Grid -->
   <div class="modes-section">
     <h2>The 10 defense modes</h2>
     <div class="modes-grid" id="modes-grid"></div>
   </div>
 
-  <!-- Result -->
   <div class="result-section" id="result-section">
-    <div class="profile-card" id="profile-card">
-      <h3>LinkedIn Profile</h3>
-      <div class="pc-name" id="pc-name"></div>
-      <div class="pc-detail" id="pc-headline"></div>
-      <div class="pc-detail" id="pc-role"></div>
-      <div class="pc-detail" id="pc-location"></div>
-    </div>
+    <span class="cache-badge" id="cache-badge"></span>
 
     <div class="result-card">
       <div class="result-mode">
@@ -244,49 +181,24 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
         <select id="correct-mode" onchange="saveCorrection()">
           <option value="">What was the actual mode?</option>
         </select>
-        <p class="fb-note">Saved locally to improve your results.</p>
+        <p class="fb-note">Feedback helps improve results.</p>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="footer">
     <p>Built by Anmol Sam — <a href="https://github.com/originaonxi" target="_blank">Aonxi</a></p>
     <p><a href="https://github.com/originaonxi/pkm-analyzer" target="_blank">github.com/originaonxi/pkm-analyzer</a></p>
     <p>Part of AROS and ARIA — autonomous revenue infrastructure</p>
-    <button class="change-key" id="change-key-btn" onclick="changeKeys()">Change API keys</button>
   </div>
 
 </div>
 
 <script>
-// --- Freemium keys (1 free use) ---
-const _a = ['sk-ant-api03-Zzxe4YaO2IgWU0Qlxc_wTx2Bbi','xQCFAFNESQjZAQXCrmAz_dKpirViqbkOi','duNu2qnmPUyvTTDNblmvKoj4nkA-REkOSAAA'];
-const _n = 'pk_live_c86ada2665e0d4a9a742bbb6a1344a04';
-const FREE_LIMIT = 1;
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `${window.location.protocol}//${window.location.host}`
+  : 'https://pkm-analyzer-api.onrender.com';
 
-function getFreeTierKey() { return _a.join(''); }
-function getFreeNetrowsKey() { return _n; }
-function getUsageCount() { return parseInt(localStorage.getItem('pkm_usage_count') || '0', 10); }
-function incrementUsage() { localStorage.setItem('pkm_usage_count', (getUsageCount() + 1).toString()); }
-function hasFreeTrial() { return getUsageCount() < FREE_LIMIT; }
-function hasOwnKeys() { return !!localStorage.getItem('anthropic_key'); }
-
-function getActiveAnthropicKey() {
-  const own = localStorage.getItem('anthropic_key');
-  if (own) return own;
-  if (hasFreeTrial()) return getFreeTierKey();
-  return null;
-}
-
-function getActiveNetrowsKey() {
-  const own = localStorage.getItem('netrows_key');
-  if (own) return own;
-  if (hasFreeTrial()) return getFreeNetrowsKey();
-  return null;
-}
-
-// --- Modes ---
 const MODES = [
   {key:'MOTIVE_INFERENCE',label:'Motive Inference',who:'VCs, ex-GTM execs',color:'#a78bfa',bypass:'PURE_DATA',forbidden:['excited','reach out','love to','synergy','opportunity','quick call','touching base']},
   {key:'TACTIC_RECOGNITION',label:'Tactic Recognition',who:'Repeat founders',color:'#fb7185',bypass:'SIGNAL_HOOK',forbidden:['I noticed','I came across','fellow founder','relevant to your work','your impressive']},
@@ -300,62 +212,11 @@ const MODES = [
   {key:'PRICE_ANCHORING',label:'Price Anchoring',who:'Budget buyers',color:'#38bdf8',bypass:'ROI_INVERSION',forbidden:['affordable','cheap','free trial','flexible pricing']},
 ];
 
-const CLASSIFY_SYSTEM = `You are a PKM (Persuasion Knowledge Model) defense analyst.
-
-Given any text about a person — their job title, bio, company, LinkedIn headline — classify them into exactly ONE of these 10 defense modes:
-
-MOTIVE_INFERENCE — VCs, ex-GTM execs (Gong, HubSpot, Salesforce, Outreach, Apollo, Clay), angel investors, sales leaders. They know persuasion tactics cold. They detect selling intent in seconds.
-
-TACTIC_RECOGNITION — Repeat founders, 2x+ raised, serial entrepreneurs. They have seen every cold email template. Generic personalization = instant delete.
-
-OVERLOAD_AVOIDANCE — SMB CEOs, home care owners, franchise operators, cleaning business owners. They get 60+ vendor pitches per week. Anything over 3 sentences = gone.
-
-SOCIAL_PROOF_SKEPTICISM — CTOs, engineers, data scientists, technical leads. They verify every claim they read. Vague claims = immediate distrust.
-
-AUTHORITY_DEFERENCE — Directors, VPs, mid-level managers. They need permission to decide. Fear making the wrong call alone.
-
-LOSS_AVERSION — Risk-aware operators, cautious buyers, regulated industries. Fear mistakes more than they want gains. Opportunity framing increases anxiety.
-
-IDENTITY_THREAT — Self-made founders, proud operators, bootstrapped business owners. Built it themselves from nothing. "Automation" feels like a replacement.
-
-TIMING_SKEPTICISM — Perpetually "not ready" buyers, always have a reason to wait. Interested but always have a blocker. Vague timing = easy exit.
-
-COMPLEXITY_FEAR — Non-technical business owners, operators who have been burned by software. Expect tools to require a developer. Any technical language = checked out.
-
-PRICE_ANCHORING — Budget-focused buyers, procurement, finance-aware operators. Already have a number in their head. Filter out anything above their anchor.
-
-Return ONLY valid JSON, no other text:
-{"mode":"MODE_NAME","confidence":85,"reasoning":"One sentence why this mode.","awareness_score":8}`;
-
-const MESSAGE_SYSTEM = `You write cold outreach messages using Persuasion Knowledge Model bypass strategies.
-
-You are given a defense mode and must write a message that does NOT trigger that defense.
-
-BYPASS STRATEGIES:
-MOTIVE_INFERENCE → PURE_DATA: Open with a number. Never open with "I". No: excited, reach out, love to, synergy, opportunity, quick call, touching base.
-TACTIC_RECOGNITION → SIGNAL_HOOK: Reference something specific from their public activity. Prove research is real. No: I noticed, I came across, fellow founder, relevant to your work.
-OVERLOAD_AVOIDANCE → ULTRA_SHORT: Under 60 words HARD CAP. One specific calendar slot. No: just wanted to, hope this finds you, when you get a chance.
-SOCIAL_PROOF_SKEPTICISM → CREDIBILITY_FIRST: Exact numbers only. Public verifiable proof. No: industry-leading, best-in-class, proven, trusted by.
-AUTHORITY_DEFERENCE → PEER_PROOF: Name peers who already use it. Give them ammo to sell internally. No: decision maker, whoever handles this.
-LOSS_AVERSION → COST_OF_INACTION: Frame what they lose by NOT acting. No: opportunity, upside, potential, imagine.
-IDENTITY_THREAT → AMPLIFICATION: Their judgment runs the system. They are still the decision maker. No: replace, automate away, eliminate.
-TIMING_SKEPTICISM → TRIGGER_EVENT: Name a specific reason NOW is different. No: whenever ready, no rush, at some point.
-COMPLEXITY_FEAR → SIMPLICITY_PROOF: Show the one action needed. Nothing else. No: API, integrate, configure, tech stack.
-PRICE_ANCHORING → ROI_INVERSION: Cost per outcome not cost per month. No: affordable, cheap, free trial, flexible.
-
-AONXI CONTEXT (use when relevant): $199K collected. $8K peak day. $2.9M ARR velocity. $0.50/day to run. github.com/originaonxi/aros-agent
-
-Write the message only. Under 80 words. No subject line. No sign-off. Just the message body.`;
-
 let currentResult = null;
 let inputMode = 'text';
-let fetchedProfile = null;
 
-// --- Init ---
 function init() {
   renderModes();
-  updateUI();
-
   const sel = document.getElementById('correct-mode');
   MODES.forEach(m => {
     const opt = document.createElement('option');
@@ -363,7 +224,6 @@ function init() {
     opt.textContent = `${m.key} — ${m.who}`;
     sel.appendChild(opt);
   });
-
   if (window.location.hash && window.location.hash.length > 1) {
     try {
       const shared = JSON.parse(atob(window.location.hash.slice(1)));
@@ -372,221 +232,49 @@ function init() {
   }
 }
 
-function updateUI() {
-  const own = hasOwnKeys();
-  const free = hasFreeTrial();
-  const canUse = own || free;
-
-  // Free banner
-  const banner = document.getElementById('free-banner');
-  const countEl = document.getElementById('free-count');
-  if (own) {
-    banner.style.display = 'none';
-  } else if (free) {
-    banner.style.display = 'flex';
-    const left = FREE_LIMIT - getUsageCount();
-    countEl.textContent = `${left} free left`;
-  } else {
-    banner.style.display = 'flex';
-    banner.querySelector('.fb-text').innerHTML = '<strong>Free trial used.</strong> Add your own API keys below for unlimited analyses.';
-    countEl.textContent = '0 free left';
-  }
-
-  // Key setup — show if no free trial AND no own keys
-  const keySetup = document.getElementById('key-setup');
-  keySetup.style.display = (!free && !own) ? 'block' : 'none';
-
-  // Input section — show if can use
-  document.getElementById('input-section').style.display = canUse ? 'block' : 'none';
-
-  // Hint text
-  const hint = document.getElementById('input-hint');
-  if (!own && free) {
-    hint.textContent = 'Free analysis — no key needed';
-  } else {
-    hint.textContent = 'Takes ~3 seconds';
-  }
-}
-
-function saveKeys() {
-  const key = document.getElementById('key-input').value.trim();
-  if (!key || !key.startsWith('sk-')) {
-    alert('Enter a valid Anthropic API key starting with sk-');
-    return;
-  }
-  localStorage.setItem('anthropic_key', key);
-
-  const netrowsKey = document.getElementById('netrows-key-input').value.trim();
-  if (netrowsKey) localStorage.setItem('netrows_key', netrowsKey);
-
-  updateUI();
-}
-
-function changeKeys() {
-  localStorage.removeItem('anthropic_key');
-  localStorage.removeItem('netrows_key');
-  document.getElementById('key-input').value = '';
-  document.getElementById('netrows-key-input').value = '';
-  updateUI();
-  // Force show key setup
-  document.getElementById('key-setup').style.display = 'block';
-}
-
 function setInputMode(mode) {
   inputMode = mode;
   document.getElementById('toggle-text').classList.toggle('active', mode === 'text');
   document.getElementById('toggle-url').classList.toggle('active', mode === 'url');
   document.getElementById('text-input-wrap').style.display = mode === 'text' ? 'block' : 'none';
   document.getElementById('url-input-wrap').style.display = mode === 'url' ? 'block' : 'none';
-
-  const urlNote = document.getElementById('url-note');
-  const hasNetrows = !!getActiveNetrowsKey();
-  if (!hasNetrows && mode === 'url') {
-    urlNote.textContent = 'Add your Netrows key to use LinkedIn URL mode.';
-    urlNote.className = 'url-note warn';
-  } else {
-    urlNote.textContent = 'Fetches profile via Netrows API, then classifies with Claude.';
-    urlNote.className = 'url-note';
-  }
 }
 
-// --- Modes ---
 function renderModes() {
   const grid = document.getElementById('modes-grid');
   MODES.forEach((m, i) => {
     const card = document.createElement('div');
     card.className = 'mode-card';
     card.id = `mode-${m.key}`;
-    card.innerHTML = `
-      <div class="mc-top">
-        <span class="mc-num" style="background:${m.color}">${i + 1}</span>
-        <span class="mc-name">${m.key}</span>
-      </div>
-      <div class="mc-who">${m.who}</div>
-    `;
+    card.innerHTML = `<div class="mc-top"><span class="mc-num" style="background:${m.color}">${i+1}</span><span class="mc-name">${m.key}</span></div><div class="mc-who">${m.who}</div>`;
     grid.appendChild(card);
   });
 }
 
-// --- Netrows LinkedIn Fetch ---
-async function fetchLinkedInProfile(url) {
-  const netrowsKey = getActiveNetrowsKey();
-  if (!netrowsKey) throw new Error('Add your Netrows key to use LinkedIn URL mode.');
-
-  const res = await fetch(
-    `https://api.netrows.com/v1/linkedin/profile?url=${encodeURIComponent(url)}`,
-    { headers: { 'Authorization': `Bearer ${netrowsKey}` } }
-  );
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'Could not fetch LinkedIn profile. Check your Netrows key.');
-  }
-
-  const d = await res.json();
-  fetchedProfile = d;
-
-  const parts = [];
-  if (d.first_name && d.last_name) parts.push(`Name: ${d.first_name} ${d.last_name}`);
-  if (d.headline) parts.push(`Headline: ${d.headline}`);
-  if (d.summary) parts.push(`Bio: ${d.summary}`);
-  if (d.current_title && d.current_company) parts.push(`Current role: ${d.current_title} at ${d.current_company}`);
-  if (d.location) parts.push(`Location: ${d.location}`);
-
-  if (!parts.length) throw new Error('Could not parse LinkedIn profile. Try pasting text instead.');
-  return parts.join('\n');
-}
-
-function showProfileCard(d) {
-  const card = document.getElementById('profile-card');
-  if (!d) { card.style.display = 'none'; return; }
-  const name = [d.first_name, d.last_name].filter(Boolean).join(' ');
-  const role = [d.current_title, d.current_company].filter(Boolean).join(' at ');
-  document.getElementById('pc-name').textContent = name || '';
-  document.getElementById('pc-headline').textContent = d.headline || '';
-  document.getElementById('pc-role').textContent = role || '';
-  document.getElementById('pc-location').textContent = d.location || '';
-  card.style.display = (name || d.headline) ? 'block' : 'none';
-}
-
-// --- Claude API ---
-async function callClaude(system, userMsg) {
-  const key = getActiveAnthropicKey();
-  if (!key) throw new Error('No API key available. Add your Anthropic key to continue.');
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1000,
-      system: system,
-      messages: [{ role: 'user', content: userMsg }]
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    if (res.status === 401) throw new Error('Invalid API key. Check your key and try again.');
-    throw new Error(err.error?.message || `API error ${res.status}`);
-  }
-
-  const data = await res.json();
-  return data.content[0].text;
-}
-
-// --- Analysis ---
 async function runAnalysis() {
   const btn = document.getElementById('analyze-btn');
   const errEl = document.getElementById('error-msg');
   const statusEl = document.getElementById('status-msg');
   errEl.textContent = '';
   statusEl.style.display = 'none';
-  fetchedProfile = null;
-  showProfileCard(null);
 
-  // Check if user can analyze
-  if (!getActiveAnthropicKey()) {
-    errEl.textContent = 'Free trial used. Add your API keys to continue.';
-    updateUI();
-    return;
-  }
-
-  let profileText = '';
-
+  const body = {};
   if (inputMode === 'url') {
     const url = document.getElementById('url-input').value.trim();
     if (!url) { errEl.textContent = 'Enter a LinkedIn URL.'; return; }
     if (!url.includes('linkedin.com/in/')) { errEl.textContent = 'Enter a valid LinkedIn profile URL.'; return; }
-
-    btn.disabled = true;
-    btn.innerHTML = 'Fetching LinkedIn profile<span class="loading-dots"></span>';
-    statusEl.textContent = 'Fetching LinkedIn profile...';
-    statusEl.style.display = 'block';
-
-    try {
-      profileText = await fetchLinkedInProfile(url);
-      showProfileCard(fetchedProfile);
-      statusEl.textContent = 'Profile fetched. Analyzing defense mode...';
-    } catch (e) {
-      errEl.textContent = e.message;
-      btn.disabled = false;
-      btn.textContent = 'Analyze defense mode';
-      statusEl.style.display = 'none';
-      return;
-    }
+    body.url = url;
   } else {
-    profileText = document.getElementById('profile-input').value.trim();
-    if (!profileText) { errEl.textContent = 'Paste some profile text first.'; return; }
+    const text = document.getElementById('profile-input').value.trim();
+    if (!text) { errEl.textContent = 'Paste some profile text first.'; return; }
+    body.text = text;
   }
 
   btn.disabled = true;
-  btn.innerHTML = 'Analyzing defense mode<span class="loading-dots"></span>';
+  const loadingText = inputMode === 'url' ? 'Fetching profile' : 'Analyzing defense mode';
+  btn.innerHTML = `${loadingText}<span class="loading-dots"></span>`;
+  statusEl.textContent = inputMode === 'url' ? 'Fetching LinkedIn profile and analyzing...' : 'Analyzing defense mode...';
+  statusEl.style.display = 'block';
 
   document.querySelectorAll('.mode-card').forEach(c => { c.classList.remove('highlighted'); c.style.borderColor = ''; });
   document.getElementById('result-section').classList.remove('visible');
@@ -595,42 +283,32 @@ async function runAnalysis() {
   document.getElementById('down-btn').className = 'msg-btn';
 
   try {
-    const classifyRaw = await callClaude(CLASSIFY_SYSTEM, `Profile:\n${profileText}`);
-    let cleaned = classifyRaw.trim();
-    if (cleaned.includes('```')) {
-      cleaned = cleaned.split('```')[1];
-      if (cleaned.startsWith('json')) cleaned = cleaned.slice(4);
-      cleaned = cleaned.trim();
+    const res = await fetch(`${API_BASE}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.detail || `Error ${res.status}`);
     }
-    const classification = JSON.parse(cleaned);
-    const mode = MODES.find(m => m.key === classification.mode) || MODES[0];
+    const data = await res.json();
+    const mode = MODES.find(m => m.key === data.detected_mode) || MODES[0];
 
     const card = document.getElementById(`mode-${mode.key}`);
-    if (card) {
-      card.classList.add('highlighted');
-      card.style.borderColor = mode.color;
-    }
-
-    statusEl.textContent = 'Generating bypass message...';
-
-    const msgPrompt = `Defense mode: ${mode.key}\nBypass strategy: ${mode.bypass}\nForbidden phrases: ${mode.forbidden.join(', ')}\n\nProfile:\n${profileText}\n\nWrite the bypass message.`;
-    const message = await callClaude(MESSAGE_SYSTEM, msgPrompt);
-
-    // Count usage if using free tier
-    if (!hasOwnKeys()) incrementUsage();
+    if (card) { card.classList.add('highlighted'); card.style.borderColor = mode.color; }
 
     currentResult = {
-      mode: mode.key, label: mode.label, color: mode.color,
-      confidence: classification.confidence, reasoning: classification.reasoning,
-      awareness_score: classification.awareness_score, bypass: mode.bypass,
-      forbidden: mode.forbidden, who: mode.who,
-      message: message.trim(), input_preview: profileText.slice(0, 120)
+      mode: mode.key, label: data.label || mode.label, color: mode.color,
+      confidence: data.confidence, reasoning: data.reasoning,
+      awareness_score: data.awareness_score, bypass: data.bypass_strategy || mode.bypass,
+      forbidden: data.forbidden_phrases || mode.forbidden,
+      who: data.who_they_are || mode.who,
+      message: data.generated_message, from_cache: data.from_cache,
+      input_preview: (body.text || body.url || '').slice(0, 120),
     };
-
     statusEl.style.display = 'none';
     showResult(currentResult);
-    updateUI();
-
   } catch (e) {
     errEl.textContent = e.message;
     statusEl.style.display = 'none';
@@ -644,6 +322,10 @@ function showResult(r) {
   const rs = document.getElementById('result-section');
   rs.classList.add('visible');
 
+  const cb = document.getElementById('cache-badge');
+  cb.textContent = r.from_cache ? 'Served from cache — instant' : 'Fresh analysis';
+  cb.className = r.from_cache ? 'cache-badge cached' : 'cache-badge fresh';
+
   document.getElementById('r-badge').textContent = r.mode;
   document.getElementById('r-badge').style.background = r.color;
   document.getElementById('r-label').textContent = r.label;
@@ -651,8 +333,8 @@ function showResult(r) {
   document.getElementById('r-reasoning').textContent = r.reasoning;
 
   const score = r.awareness_score;
-  const scoreLabel = score >= 7 ? 'High awareness — tread carefully' : score >= 4 ? 'Moderate awareness — standard bypass works' : 'Low awareness — direct approach viable';
-  document.getElementById('r-awareness-text').textContent = `${score}/10 — ${scoreLabel}`;
+  const lbl = score >= 7 ? 'High awareness — tread carefully' : score >= 4 ? 'Moderate awareness — standard bypass works' : 'Low awareness — direct approach viable';
+  document.getElementById('r-awareness-text').textContent = `${score}/10 — ${lbl}`;
   const bar = document.getElementById('r-awareness-bar');
   bar.style.width = `${score * 10}%`;
   bar.style.background = score >= 7 ? '#ef4444' : score >= 4 ? '#fbbf24' : '#4ade80';
@@ -661,7 +343,7 @@ function showResult(r) {
 
   const fl = document.getElementById('r-forbidden');
   fl.innerHTML = '';
-  r.forbidden.forEach(p => {
+  (r.forbidden || []).forEach(p => {
     const span = document.createElement('span');
     span.className = 'forbidden-pill';
     span.textContent = `"${p}"`;
@@ -679,7 +361,6 @@ function showResult(r) {
     }));
     history.replaceState(null, '', '#' + encoded);
   } catch(e) {}
-
   rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -691,7 +372,7 @@ function showSharedResult(data) {
     confidence: data.confidence, reasoning: data.reasoning,
     awareness_score: data.awareness_score, bypass: data.bypass || mode.bypass,
     forbidden: data.forbidden || mode.forbidden, who: data.who || mode.who,
-    message: data.message, input_preview: data.input_preview || ''
+    message: data.message, input_preview: data.input_preview || '', from_cache: false,
   };
   const card = document.getElementById(`mode-${mode.key}`);
   if (card) { card.classList.add('highlighted'); card.style.borderColor = mode.color; }
@@ -699,35 +380,21 @@ function showSharedResult(data) {
 }
 
 function copyMessage() {
-  const text = document.getElementById('r-message').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 1500);
+  navigator.clipboard.writeText(document.getElementById('r-message').textContent).then(() => {
+    const b = document.getElementById('copy-btn'); b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy', 1500);
   });
 }
 
 function shareResult() {
   navigator.clipboard.writeText(window.location.href).then(() => {
-    const btn = document.getElementById('share-btn');
-    btn.textContent = 'Link copied!';
-    setTimeout(() => btn.textContent = 'Share', 1500);
+    const b = document.getElementById('share-btn'); b.textContent = 'Link copied!'; setTimeout(() => b.textContent = 'Share', 1500);
   });
 }
 
 function rateFeedback(dir) {
-  const upBtn = document.getElementById('up-btn');
-  const downBtn = document.getElementById('down-btn');
-  const dropdown = document.getElementById('feedback-dropdown');
-  if (dir === 'up') {
-    upBtn.className = 'msg-btn active-up';
-    downBtn.className = 'msg-btn';
-    dropdown.classList.remove('visible');
-  } else {
-    downBtn.className = 'msg-btn active-down';
-    upBtn.className = 'msg-btn';
-    dropdown.classList.add('visible');
-  }
+  document.getElementById('up-btn').className = dir === 'up' ? 'msg-btn active-up' : 'msg-btn';
+  document.getElementById('down-btn').className = dir === 'down' ? 'msg-btn active-down' : 'msg-btn';
+  document.getElementById('feedback-dropdown').classList.toggle('visible', dir === 'down');
   const ratings = JSON.parse(localStorage.getItem('pkm_ratings') || '[]');
   ratings.push({ mode: currentResult?.mode, feedback: dir, timestamp: new Date().toISOString() });
   localStorage.setItem('pkm_ratings', JSON.stringify(ratings));
