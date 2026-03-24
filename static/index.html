@@ -3,258 +3,553 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PKM Analyzer</title>
+<title>PKM Analyzer — Defense Mode Detection</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f0f;color:#e0e0e0;min-height:100vh;line-height:1.5}
+a{color:#888;text-decoration:none}a:hover{color:#ccc}
 
-  .container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
+.container{max-width:800px;margin:0 auto;padding:40px 24px 60px}
 
-  h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
-  .subtitle { color: #888; font-size: 0.95rem; margin-bottom: 32px; }
+/* Header */
+.header{margin-bottom:32px}
+.header h1{font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.header p{color:#666;font-size:0.88rem;margin-top:4px}
 
-  /* Input Section */
-  .input-section { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+/* API Key Setup */
+.key-setup{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:32px;margin-bottom:32px}
+.key-setup h2{font-size:1.1rem;color:#fff;margin-bottom:12px}
+.key-setup p{color:#888;font-size:0.85rem;margin-bottom:16px;line-height:1.6}
+.key-row{display:flex;gap:10px}
+.key-input{flex:1;background:#0f0f0f;border:1px solid #333;border-radius:8px;padding:12px 14px;color:#e0e0e0;font-size:0.9rem;font-family:monospace}
+.key-input:focus{outline:none;border-color:#555}
+.key-input::placeholder{color:#444}
+.key-save-btn{background:#fff;color:#000;border:none;border-radius:8px;padding:12px 24px;font-weight:600;font-size:0.88rem;cursor:pointer;white-space:nowrap}
+.key-save-btn:hover{opacity:0.85}
+.key-note{color:#555;font-size:0.78rem;margin-top:12px;line-height:1.5}
+.key-note a{color:#888}
 
-  .toggle-bar { display: flex; gap: 0; margin-bottom: 16px; background: #1a1a1a; border-radius: 8px; overflow: hidden; border: 1px solid #222; }
-  .toggle-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #888; transition: all 0.2s; border: none; background: none; }
-  .toggle-btn.active { background: #222; color: #fff; }
+/* Input Section */
+.input-section{margin-bottom:32px}
+.input-section textarea{width:100%;height:130px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px;color:#e0e0e0;font-size:0.9rem;font-family:inherit;resize:vertical;line-height:1.5}
+.input-section textarea:focus{outline:none;border-color:#444}
+.input-section textarea::placeholder{color:#555;line-height:1.5}
+.input-row{display:flex;align-items:center;gap:12px;margin-top:12px}
+.analyze-btn{background:#fff;color:#000;border:none;border-radius:8px;padding:14px 32px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+.analyze-btn:hover{opacity:0.85}
+.analyze-btn:disabled{opacity:0.35;cursor:not-allowed}
+.input-hint{color:#555;font-size:0.78rem}
+.error-msg{color:#ef4444;font-size:0.85rem;margin-top:10px}
 
-  textarea { width: 100%; height: 140px; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 14px; color: #e0e0e0; font-size: 0.9rem; resize: vertical; font-family: inherit; }
-  textarea:focus { outline: none; border-color: #555; }
-  textarea::placeholder { color: #555; }
+/* Modes Grid */
+.modes-section{margin-bottom:32px}
+.modes-section h2{font-size:1rem;color:#888;margin-bottom:14px;font-weight:500}
+.modes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-card{background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:14px 16px;transition:all 0.3s}
+.mode-card .mc-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.mode-card .mc-num{font-size:0.7rem;font-weight:700;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#000;flex-shrink:0}
+.mode-card .mc-name{font-size:0.82rem;font-weight:600;color:#ccc;letter-spacing:0.3px}
+.mode-card .mc-who{font-size:0.75rem;color:#666;margin-left:28px}
+.mode-card.highlighted{background:#222;transform:scale(1.02)}
+.mode-card.highlighted .mc-name{color:#fff}
 
-  .url-input { width: 100%; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 14px; color: #e0e0e0; font-size: 0.9rem; font-family: inherit; }
-  .url-input:focus { outline: none; border-color: #555; }
-  .url-input::placeholder { color: #555; }
+/* Result Section */
+.result-section{display:none;margin-bottom:32px}
+.result-section.visible{display:block}
 
-  .url-note { color: #f59e0b; font-size: 0.78rem; margin-top: 8px; }
+.result-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px}
+.result-mode{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.result-mode-badge{padding:8px 18px;border-radius:8px;font-weight:700;font-size:0.88rem;color:#000;letter-spacing:0.3px}
+.result-mode-label{font-size:1rem;color:#fff;font-weight:600}
+.result-conf{font-size:0.82rem;color:#888}
 
-  .analyze-btn { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 16px; transition: opacity 0.2s; }
-  .analyze-btn:hover { opacity: 0.85; }
-  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.result-row{margin-bottom:14px}
+.result-row-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:6px;font-weight:600}
+.result-row-value{font-size:0.88rem;color:#ccc;line-height:1.5}
 
-  /* Result Section */
-  .result-section { display: none; }
-  .result-section.visible { display: block; }
+.awareness-bar-track{width:100%;height:8px;background:#2a2a2a;border-radius:4px;overflow:hidden;margin-top:6px}
+.awareness-bar-fill{height:100%;border-radius:4px;transition:width 0.5s}
 
-  .result-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding: 20px; background: #141414; border: 1px solid #222; border-radius: 12px; }
-  .mode-badge { background: #fff; color: #000; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; }
-  .result-meta { flex: 1; }
-  .result-meta h2 { font-size: 1.1rem; color: #fff; margin-bottom: 4px; }
-  .result-meta p { color: #888; font-size: 0.85rem; }
-  .confidence-pill { background: #1a1a1a; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; color: #aaa; }
+.bypass-pill{display:inline-block;background:#1e293b;border:1px solid #334155;color:#93c5fd;padding:4px 14px;border-radius:6px;font-size:0.82rem;font-weight:500}
 
-  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .detail-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 18px; }
-  .detail-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
-  .detail-card p { font-size: 0.9rem; color: #ccc; line-height: 1.5; }
-  .detail-card.full { grid-column: 1 / -1; }
+.forbidden-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.forbidden-pill{background:#1c0808;border:1px solid #3a1212;color:#f87171;padding:3px 10px;border-radius:5px;font-size:0.78rem}
 
-  .message-card { background: #141414; border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 32px; position: relative; }
-  .message-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; }
-  .message-text { font-size: 1rem; line-height: 1.6; color: #fff; white-space: pre-wrap; }
-  .copy-btn { position: absolute; top: 16px; right: 16px; background: #222; border: 1px solid #333; color: #aaa; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
-  .copy-btn:hover { background: #333; color: #fff; }
+/* Message Card */
+.message-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px;position:relative}
+.message-card .mc-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:12px;font-weight:600}
+.message-text{font-size:0.95rem;color:#fff;line-height:1.7;white-space:pre-wrap}
+.msg-actions{display:flex;gap:8px;margin-top:16px}
+.msg-btn{background:#222;border:1px solid #333;color:#aaa;padding:8px 16px;border-radius:7px;cursor:pointer;font-size:0.82rem;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.msg-btn:hover{background:#333;color:#fff}
+.msg-btn.active-up{background:#064e3b;border-color:#065f46;color:#6ee7b7}
+.msg-btn.active-down{background:#450a0a;border-color:#7f1d1d;color:#fca5a5}
 
-  .forbidden-list { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-  .forbidden-list li { background: #1c0a0a; border: 1px solid #3a1515; color: #e55; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; }
+/* Feedback dropdown */
+.feedback-dropdown{margin-top:12px;display:none}
+.feedback-dropdown.visible{display:block}
+.feedback-dropdown select{background:#0f0f0f;border:1px solid #333;border-radius:6px;padding:8px 12px;color:#e0e0e0;font-size:0.85rem;width:100%}
+.feedback-dropdown select:focus{outline:none;border-color:#555}
+.fb-note{color:#555;font-size:0.75rem;margin-top:6px}
 
-  /* Modes Grid */
-  .modes-section { margin-top: 40px; }
-  .modes-section h2 { font-size: 1.1rem; color: #fff; margin-bottom: 16px; }
-  .modes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-  .mode-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 16px; cursor: default; transition: border-color 0.2s; }
-  .mode-card.highlighted { border-color: #fff; background: #1a1a1a; }
-  .mode-card .mode-name { font-weight: 700; font-size: 0.85rem; color: #fff; margin-bottom: 4px; letter-spacing: 0.3px; }
-  .mode-card .mode-who { font-size: 0.78rem; color: #888; margin-bottom: 8px; }
-  .mode-card .mode-desc { font-size: 0.82rem; color: #666; line-height: 1.4; }
+/* Footer */
+.footer{border-top:1px solid #1a1a1a;padding-top:24px;margin-top:40px;text-align:center}
+.footer p{color:#444;font-size:0.78rem;line-height:1.8}
+.footer a{color:#666}
+.change-key{color:#555;font-size:0.75rem;cursor:pointer;border:none;background:none;margin-top:8px;text-decoration:underline}
+.change-key:hover{color:#888}
 
-  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 8px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Loading */
+.loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 
-  .error-msg { color: #e55; font-size: 0.85rem; margin-top: 8px; }
-
-  @media (max-width: 640px) {
-    .detail-grid { grid-template-columns: 1fr; }
-    .modes-grid { grid-template-columns: 1fr; }
-  }
+@media(max-width:600px){
+  .modes-grid{grid-template-columns:1fr}
+  .key-row{flex-direction:column}
+  .msg-actions{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>PKM Analyzer</h1>
-  <p class="subtitle">Detect defense modes. Generate bypass messages. Based on Friestad & Wright (1994).</p>
 
-  <div class="input-section">
-    <div class="toggle-bar">
-      <button class="toggle-btn active" onclick="setMode('text')">Paste Text</button>
-      <button class="toggle-btn" onclick="setMode('url')">LinkedIn URL</button>
+  <div class="header">
+    <h1>PKM Analyzer</h1>
+    <p>Defense mode detection based on Friestad & Wright (1994)</p>
+  </div>
+
+  <!-- API Key Setup -->
+  <div class="key-setup" id="key-setup">
+    <h2>Enter your Anthropic API key to start</h2>
+    <p>Your key is stored in your browser only. It is never sent anywhere except directly to the Anthropic API.</p>
+    <div class="key-row">
+      <input class="key-input" id="key-input" type="password" placeholder="sk-ant-...">
+      <button class="key-save-btn" onclick="saveKey()">Save and continue</button>
     </div>
-    <div id="text-input">
-      <textarea id="profile-text" placeholder="Paste a LinkedIn bio, headline, or any profile text..."></textarea>
+    <p class="key-note">Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+  </div>
+
+  <!-- Input Section -->
+  <div class="input-section" id="input-section" style="display:none">
+    <textarea id="profile-input" placeholder="Paste anything about your prospect:&#10;LinkedIn bio, headline, job title, company name, or just their role.&#10;&#10;Example: Sarah Chen, Partner at Bessemer,&#10;previously VP Sales at Gong, angel investor"></textarea>
+    <div class="input-row">
+      <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">Analyze defense mode</button>
+      <span class="input-hint">Takes ~3 seconds</span>
     </div>
-    <div id="url-input" style="display:none">
-      <input class="url-input" id="profile-url" type="url" placeholder="https://linkedin.com/in/username">
-      <p class="url-note">Requires a working RapidAPI LinkedIn subscription. Configure RAPIDAPI_KEY in .env</p>
-    </div>
-    <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">Analyze Profile</button>
     <p class="error-msg" id="error-msg"></p>
   </div>
 
-  <div class="result-section" id="result-section">
-    <div class="result-header">
-      <span class="mode-badge" id="r-mode-badge"></span>
-      <div class="result-meta">
-        <h2 id="r-label"></h2>
-        <p id="r-reasoning"></p>
-      </div>
-      <span class="confidence-pill" id="r-confidence"></span>
-    </div>
+  <!-- Modes Grid -->
+  <div class="modes-section">
+    <h2>The 10 defense modes</h2>
+    <div class="modes-grid" id="modes-grid"></div>
+  </div>
 
-    <div class="detail-grid">
-      <div class="detail-card">
-        <h3>Who They Are</h3>
-        <p id="r-who"></p>
+  <!-- Result -->
+  <div class="result-section" id="result-section">
+    <div class="result-card">
+      <div class="result-mode">
+        <span class="result-mode-badge" id="r-badge"></span>
+        <div>
+          <div class="result-mode-label" id="r-label"></div>
+          <div class="result-conf" id="r-conf"></div>
+        </div>
       </div>
-      <div class="detail-card">
-        <h3>Awareness Score</h3>
-        <p id="r-awareness"></p>
+
+      <div class="result-row">
+        <div class="result-row-label">Why this mode</div>
+        <div class="result-row-value" id="r-reasoning"></div>
       </div>
-      <div class="detail-card full">
-        <h3>Bypass Strategy</h3>
-        <p id="r-strategy"></p>
+
+      <div class="result-row">
+        <div class="result-row-label">Awareness score</div>
+        <div class="result-row-value" id="r-awareness-text"></div>
+        <div class="awareness-bar-track"><div class="awareness-bar-fill" id="r-awareness-bar"></div></div>
       </div>
-      <div class="detail-card full">
-        <h3>Forbidden Phrases</h3>
-        <ul class="forbidden-list" id="r-forbidden"></ul>
+
+      <div class="result-row">
+        <div class="result-row-label">Bypass strategy</div>
+        <div class="result-row-value"><span class="bypass-pill" id="r-strategy"></span></div>
+      </div>
+
+      <div class="result-row">
+        <div class="result-row-label">Forbidden phrases</div>
+        <div class="forbidden-list" id="r-forbidden"></div>
       </div>
     </div>
 
     <div class="message-card">
-      <h3>Generated Bypass Message</h3>
-      <button class="copy-btn" onclick="copyMessage()">Copy</button>
+      <div class="mc-label">Generated bypass message</div>
       <div class="message-text" id="r-message"></div>
+      <div class="msg-actions">
+        <button class="msg-btn" id="copy-btn" onclick="copyMessage()">Copy</button>
+        <button class="msg-btn" id="share-btn" onclick="shareResult()">Share</button>
+        <button class="msg-btn" id="up-btn" onclick="rateFeedback('up')">&#9650; Good</button>
+        <button class="msg-btn" id="down-btn" onclick="rateFeedback('down')">&#9660; Bad</button>
+      </div>
+      <div class="feedback-dropdown" id="feedback-dropdown">
+        <select id="correct-mode" onchange="saveCorrection()">
+          <option value="">What was the actual mode?</option>
+        </select>
+        <p class="fb-note">Saved locally to improve your results.</p>
+      </div>
     </div>
   </div>
 
-  <div class="modes-section">
-    <h2>All 10 Defense Modes</h2>
-    <div class="modes-grid" id="modes-grid"></div>
+  <!-- Footer -->
+  <div class="footer">
+    <p>Built by Anmol Sam — <a href="https://github.com/originaonxi" target="_blank">Aonxi</a></p>
+    <p><a href="https://github.com/originaonxi/pkm-analyzer" target="_blank">github.com/originaonxi/pkm-analyzer</a></p>
+    <p>Part of AROS and ARIA — autonomous revenue infrastructure</p>
+    <button class="change-key" id="change-key-btn" onclick="changeKey()" style="display:none">Change API key</button>
   </div>
+
 </div>
 
 <script>
-  let inputMode = 'text';
+const MODES = [
+  {key:'MOTIVE_INFERENCE',label:'Motive Inference',who:'VCs, ex-GTM execs',color:'#a78bfa',bypass:'PURE_DATA',forbidden:['excited','reach out','love to','synergy','opportunity','quick call','touching base']},
+  {key:'TACTIC_RECOGNITION',label:'Tactic Recognition',who:'Repeat founders',color:'#fb7185',bypass:'SIGNAL_HOOK',forbidden:['I noticed','I came across','fellow founder','relevant to your work','your impressive']},
+  {key:'OVERLOAD_AVOIDANCE',label:'Overload Avoidance',who:'Busy SMB operators',color:'#2dd4bf',bypass:'ULTRA_SHORT',forbidden:['just wanted to','hope this finds you','when you get a chance','at your convenience']},
+  {key:'SOCIAL_PROOF_SKEPTICISM',label:'Social Proof Skepticism',who:'CTOs, engineers',color:'#60a5fa',bypass:'CREDIBILITY_FIRST',forbidden:['industry-leading','best-in-class','proven','trusted by','world-class']},
+  {key:'AUTHORITY_DEFERENCE',label:'Authority Deference',who:'Mid-level managers',color:'#fbbf24',bypass:'PEER_PROOF',forbidden:['decision maker','whoever handles this']},
+  {key:'LOSS_AVERSION',label:'Loss Aversion',who:'Risk-aware buyers',color:'#f472b6',bypass:'COST_OF_INACTION',forbidden:['opportunity','upside','potential','imagine']},
+  {key:'IDENTITY_THREAT',label:'Identity Threat',who:'Proud operators',color:'#4ade80',bypass:'AMPLIFICATION',forbidden:['replace','automate away','eliminate']},
+  {key:'TIMING_SKEPTICISM',label:'Timing Skepticism',who:'Perpetual "not ready"',color:'#9ca3af',bypass:'TRIGGER_EVENT',forbidden:['whenever ready','no rush','at some point']},
+  {key:'COMPLEXITY_FEAR',label:'Complexity Fear',who:'Non-technical owners',color:'#f87171',bypass:'SIMPLICITY_PROOF',forbidden:['API','integrate','configure','tech stack']},
+  {key:'PRICE_ANCHORING',label:'Price Anchoring',who:'Budget buyers',color:'#38bdf8',bypass:'ROI_INVERSION',forbidden:['affordable','cheap','free trial','flexible pricing']},
+];
 
-  function setMode(mode) {
-    inputMode = mode;
-    document.querySelectorAll('.toggle-btn').forEach((b, i) => {
-      b.classList.toggle('active', (i === 0 && mode === 'text') || (i === 1 && mode === 'url'));
-    });
-    document.getElementById('text-input').style.display = mode === 'text' ? 'block' : 'none';
-    document.getElementById('url-input').style.display = mode === 'url' ? 'block' : 'none';
-  }
+const CLASSIFY_SYSTEM = `You are a PKM (Persuasion Knowledge Model) defense analyst.
 
-  async function runAnalysis() {
-    const btn = document.getElementById('analyze-btn');
-    const err = document.getElementById('error-msg');
-    err.textContent = '';
+Given any text about a person — their job title, bio, company, LinkedIn headline — classify them into exactly ONE of these 10 defense modes:
 
-    const body = {};
-    if (inputMode === 'text') {
-      const text = document.getElementById('profile-text').value.trim();
-      if (!text) { err.textContent = 'Paste some profile text first.'; return; }
-      body.text = text;
-    } else {
-      const url = document.getElementById('profile-url').value.trim();
-      if (!url) { err.textContent = 'Enter a LinkedIn URL.'; return; }
-      body.url = url;
-    }
+MOTIVE_INFERENCE — VCs, ex-GTM execs (Gong, HubSpot, Salesforce, Outreach, Apollo, Clay), angel investors, sales leaders. They know persuasion tactics cold. They detect selling intent in seconds.
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Analyzing...';
+TACTIC_RECOGNITION — Repeat founders, 2x+ raised, serial entrepreneurs. They have seen every cold email template. Generic personalization = instant delete.
 
+OVERLOAD_AVOIDANCE — SMB CEOs, home care owners, franchise operators, cleaning business owners. They get 60+ vendor pitches per week. Anything over 3 sentences = gone.
+
+SOCIAL_PROOF_SKEPTICISM — CTOs, engineers, data scientists, technical leads. They verify every claim they read. Vague claims = immediate distrust.
+
+AUTHORITY_DEFERENCE — Directors, VPs, mid-level managers. They need permission to decide. Fear making the wrong call alone.
+
+LOSS_AVERSION — Risk-aware operators, cautious buyers, regulated industries. Fear mistakes more than they want gains. Opportunity framing increases anxiety.
+
+IDENTITY_THREAT — Self-made founders, proud operators, bootstrapped business owners. Built it themselves from nothing. "Automation" feels like a replacement.
+
+TIMING_SKEPTICISM — Perpetually "not ready" buyers, always have a reason to wait. Interested but always have a blocker. Vague timing = easy exit.
+
+COMPLEXITY_FEAR — Non-technical business owners, operators who have been burned by software. Expect tools to require a developer. Any technical language = checked out.
+
+PRICE_ANCHORING — Budget-focused buyers, procurement, finance-aware operators. Already have a number in their head. Filter out anything above their anchor.
+
+Return ONLY valid JSON, no other text:
+{"mode":"MODE_NAME","confidence":85,"reasoning":"One sentence why this mode.","awareness_score":8}`;
+
+const MESSAGE_SYSTEM = `You write cold outreach messages using Persuasion Knowledge Model bypass strategies.
+
+You are given a defense mode and must write a message that does NOT trigger that defense.
+
+BYPASS STRATEGIES:
+MOTIVE_INFERENCE → PURE_DATA: Open with a number. Never open with "I". No: excited, reach out, love to, synergy, opportunity, quick call, touching base.
+TACTIC_RECOGNITION → SIGNAL_HOOK: Reference something specific from their public activity. Prove research is real. No: I noticed, I came across, fellow founder, relevant to your work.
+OVERLOAD_AVOIDANCE → ULTRA_SHORT: Under 60 words HARD CAP. One specific calendar slot. No: just wanted to, hope this finds you, when you get a chance.
+SOCIAL_PROOF_SKEPTICISM → CREDIBILITY_FIRST: Exact numbers only. Public verifiable proof. No: industry-leading, best-in-class, proven, trusted by.
+AUTHORITY_DEFERENCE → PEER_PROOF: Name peers who already use it. Give them ammo to sell internally. No: decision maker, whoever handles this.
+LOSS_AVERSION → COST_OF_INACTION: Frame what they lose by NOT acting. No: opportunity, upside, potential, imagine.
+IDENTITY_THREAT → AMPLIFICATION: Their judgment runs the system. They are still the decision maker. No: replace, automate away, eliminate.
+TIMING_SKEPTICISM → TRIGGER_EVENT: Name a specific reason NOW is different. No: whenever ready, no rush, at some point.
+COMPLEXITY_FEAR → SIMPLICITY_PROOF: Show the one action needed. Nothing else. No: API, integrate, configure, tech stack.
+PRICE_ANCHORING → ROI_INVERSION: Cost per outcome not cost per month. No: affordable, cheap, free trial, flexible.
+
+AONXI CONTEXT (use when relevant): $199K collected. $8K peak day. $2.9M ARR velocity. $0.50/day to run. github.com/originaonxi/aros-agent
+
+Write the message only. Under 80 words. No subject line. No sign-off. Just the message body.`;
+
+let currentResult = null;
+
+// --- Init ---
+function init() {
+  renderModes();
+  const hasKey = !!localStorage.getItem('anthropic_key');
+  document.getElementById('key-setup').style.display = hasKey ? 'none' : 'block';
+  document.getElementById('input-section').style.display = hasKey ? 'block' : 'none';
+  document.getElementById('change-key-btn').style.display = hasKey ? 'inline-block' : 'none';
+
+  // Populate correction dropdown
+  const sel = document.getElementById('correct-mode');
+  MODES.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.key;
+    opt.textContent = `${m.key} — ${m.who}`;
+    sel.appendChild(opt);
+  });
+
+  // Check for shared result in hash
+  if (window.location.hash && window.location.hash.length > 1) {
     try {
-      const res = await fetch('/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.detail || `Error ${res.status}`);
-      }
-      const data = await res.json();
-      showResult(data);
-    } catch (e) {
-      err.textContent = e.message;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Analyze Profile';
+      const shared = JSON.parse(atob(window.location.hash.slice(1)));
+      if (shared.mode) showSharedResult(shared);
+    } catch(e) {}
+  }
+}
+
+function saveKey() {
+  const key = document.getElementById('key-input').value.trim();
+  if (!key || !key.startsWith('sk-')) {
+    alert('Enter a valid Anthropic API key starting with sk-');
+    return;
+  }
+  localStorage.setItem('anthropic_key', key);
+  document.getElementById('key-setup').style.display = 'none';
+  document.getElementById('input-section').style.display = 'block';
+  document.getElementById('change-key-btn').style.display = 'inline-block';
+}
+
+function changeKey() {
+  localStorage.removeItem('anthropic_key');
+  document.getElementById('key-setup').style.display = 'block';
+  document.getElementById('input-section').style.display = 'none';
+  document.getElementById('change-key-btn').style.display = 'none';
+  document.getElementById('key-input').value = '';
+}
+
+// --- Modes ---
+function renderModes() {
+  const grid = document.getElementById('modes-grid');
+  MODES.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.className = 'mode-card';
+    card.id = `mode-${m.key}`;
+    card.innerHTML = `
+      <div class="mc-top">
+        <span class="mc-num" style="background:${m.color}">${i + 1}</span>
+        <span class="mc-name">${m.key}</span>
+      </div>
+      <div class="mc-who">${m.who}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// --- API ---
+async function callClaude(system, userMsg) {
+  const key = localStorage.getItem('anthropic_key');
+  if (!key) throw new Error('No API key set.');
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1000,
+      system: system,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    if (res.status === 401) throw new Error('Invalid API key. Check your key and try again.');
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+// --- Analysis ---
+async function runAnalysis() {
+  const btn = document.getElementById('analyze-btn');
+  const errEl = document.getElementById('error-msg');
+  errEl.textContent = '';
+
+  const text = document.getElementById('profile-input').value.trim();
+  if (!text) { errEl.textContent = 'Paste some profile text first.'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = 'Analyzing defense mode<span class="loading-dots"></span>';
+
+  // Reset
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('highlighted'));
+  document.getElementById('result-section').classList.remove('visible');
+  document.getElementById('feedback-dropdown').classList.remove('visible');
+  document.getElementById('up-btn').className = 'msg-btn';
+  document.getElementById('down-btn').className = 'msg-btn';
+
+  try {
+    // Call 1: Classify
+    const classifyRaw = await callClaude(CLASSIFY_SYSTEM, `Profile:\n${text}`);
+    let cleaned = classifyRaw.trim();
+    if (cleaned.includes('```')) {
+      cleaned = cleaned.split('```')[1];
+      if (cleaned.startsWith('json')) cleaned = cleaned.slice(4);
+      cleaned = cleaned.trim();
     }
-  }
+    const classification = JSON.parse(cleaned);
+    const mode = MODES.find(m => m.key === classification.mode) || MODES[0];
 
-  function showResult(d) {
-    document.getElementById('result-section').classList.add('visible');
-    document.getElementById('r-mode-badge').textContent = d.detected_mode;
-    document.getElementById('r-label').textContent = d.label;
-    document.getElementById('r-reasoning').textContent = d.reasoning;
-    document.getElementById('r-confidence').textContent = `${d.confidence}% confidence`;
-    document.getElementById('r-who').textContent = d.who_they_are;
-    document.getElementById('r-awareness').textContent = `${d.awareness_score} / 10 — ${d.awareness_score >= 7 ? 'High awareness. Tread carefully.' : d.awareness_score >= 4 ? 'Moderate awareness. Standard bypass works.' : 'Low awareness. Direct approach viable.'}`;
-    document.getElementById('r-strategy').textContent = d.bypass_strategy;
-    document.getElementById('r-message').textContent = d.generated_message;
-
-    const fl = document.getElementById('r-forbidden');
-    fl.innerHTML = '';
-    (d.forbidden_phrases || []).forEach(p => {
-      const li = document.createElement('li');
-      li.textContent = `"${p}"`;
-      fl.appendChild(li);
-    });
-
-    // Highlight matching mode card
-    document.querySelectorAll('.mode-card').forEach(c => {
-      c.classList.toggle('highlighted', c.dataset.mode === d.detected_mode);
-    });
-
-    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function copyMessage() {
-    const text = document.getElementById('r-message').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('.copy-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
-    });
-  }
-
-  // Load modes grid
-  async function loadModes() {
-    try {
-      const res = await fetch('/modes');
-      const modes = await res.json();
-      const grid = document.getElementById('modes-grid');
-      grid.innerHTML = '';
-      for (const [key, m] of Object.entries(modes)) {
-        const card = document.createElement('div');
-        card.className = 'mode-card';
-        card.dataset.mode = key;
-        card.innerHTML = `
-          <div class="mode-name">${key}</div>
-          <div class="mode-who">${m.who}</div>
-          <div class="mode-desc">${m.description}</div>
-        `;
-        grid.appendChild(card);
-      }
-    } catch (e) {
-      console.error('Failed to load modes', e);
+    // Highlight card
+    const card = document.getElementById(`mode-${mode.key}`);
+    if (card) {
+      card.classList.add('highlighted');
+      card.style.borderColor = mode.color;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
+    // Call 2: Generate message
+    const msgPrompt = `Defense mode: ${mode.key}\nBypass strategy: ${mode.bypass}\nForbidden phrases: ${mode.forbidden.join(', ')}\n\nProfile:\n${text}\n\nWrite the bypass message.`;
+    const message = await callClaude(MESSAGE_SYSTEM, msgPrompt);
+
+    // Build result
+    currentResult = {
+      mode: mode.key,
+      label: mode.label,
+      color: mode.color,
+      confidence: classification.confidence,
+      reasoning: classification.reasoning,
+      awareness_score: classification.awareness_score,
+      bypass: mode.bypass,
+      forbidden: mode.forbidden,
+      who: mode.who,
+      message: message.trim(),
+      input_preview: text.slice(0, 120)
+    };
+
+    showResult(currentResult);
+
+  } catch (e) {
+    errEl.textContent = e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Analyze defense mode';
+  }
+}
+
+function showResult(r) {
+  const rs = document.getElementById('result-section');
+  rs.classList.add('visible');
+
+  const badge = document.getElementById('r-badge');
+  badge.textContent = r.mode;
+  badge.style.background = r.color;
+
+  document.getElementById('r-label').textContent = r.label;
+  document.getElementById('r-conf').textContent = `${r.confidence}% confidence`;
+  document.getElementById('r-reasoning').textContent = r.reasoning;
+
+  const score = r.awareness_score;
+  const scoreLabel = score >= 7 ? 'High awareness — tread carefully' : score >= 4 ? 'Moderate awareness — standard bypass works' : 'Low awareness — direct approach viable';
+  document.getElementById('r-awareness-text').textContent = `${score}/10 — ${scoreLabel}`;
+  const bar = document.getElementById('r-awareness-bar');
+  bar.style.width = `${score * 10}%`;
+  bar.style.background = score >= 7 ? '#ef4444' : score >= 4 ? '#fbbf24' : '#4ade80';
+
+  document.getElementById('r-strategy').textContent = r.bypass;
+
+  const fl = document.getElementById('r-forbidden');
+  fl.innerHTML = '';
+  r.forbidden.forEach(p => {
+    const span = document.createElement('span');
+    span.className = 'forbidden-pill';
+    span.textContent = `"${p}"`;
+    fl.appendChild(span);
+  });
+
+  document.getElementById('r-message').textContent = r.message;
+
+  // Update hash for sharing
+  try {
+    const encoded = btoa(JSON.stringify({
+      mode: r.mode, confidence: r.confidence, reasoning: r.reasoning,
+      awareness_score: r.awareness_score, message: r.message,
+      input_preview: r.input_preview, bypass: r.bypass,
+      forbidden: r.forbidden, who: r.who, label: r.label, color: r.color
+    }));
+    history.replaceState(null, '', '#' + encoded);
+  } catch(e) {}
+
+  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showSharedResult(data) {
+  const mode = MODES.find(m => m.key === data.mode);
+  if (!mode) return;
+  currentResult = {
+    mode: data.mode, label: data.label || mode.label, color: data.color || mode.color,
+    confidence: data.confidence, reasoning: data.reasoning,
+    awareness_score: data.awareness_score, bypass: data.bypass || mode.bypass,
+    forbidden: data.forbidden || mode.forbidden, who: data.who || mode.who,
+    message: data.message, input_preview: data.input_preview || ''
+  };
+
+  const card = document.getElementById(`mode-${mode.key}`);
+  if (card) { card.classList.add('highlighted'); card.style.borderColor = mode.color; }
+
+  showResult(currentResult);
+}
+
+// --- Actions ---
+function copyMessage() {
+  const text = document.getElementById('r-message').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+function shareResult() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = document.getElementById('share-btn');
+    btn.textContent = 'Link copied!';
+    setTimeout(() => btn.textContent = 'Share', 1500);
+  });
+}
+
+function rateFeedback(dir) {
+  const upBtn = document.getElementById('up-btn');
+  const downBtn = document.getElementById('down-btn');
+  const dropdown = document.getElementById('feedback-dropdown');
+
+  if (dir === 'up') {
+    upBtn.className = 'msg-btn active-up';
+    downBtn.className = 'msg-btn';
+    dropdown.classList.remove('visible');
+  } else {
+    downBtn.className = 'msg-btn active-down';
+    upBtn.className = 'msg-btn';
+    dropdown.classList.add('visible');
   }
 
-  loadModes();
+  // Store in localStorage
+  const ratings = JSON.parse(localStorage.getItem('pkm_ratings') || '[]');
+  ratings.push({
+    mode: currentResult?.mode, feedback: dir,
+    timestamp: new Date().toISOString()
+  });
+  localStorage.setItem('pkm_ratings', JSON.stringify(ratings));
+}
+
+function saveCorrection() {
+  const val = document.getElementById('correct-mode').value;
+  if (!val) return;
+  const corrections = JSON.parse(localStorage.getItem('pkm_corrections') || '[]');
+  corrections.push({
+    detected: currentResult?.mode, actual: val,
+    timestamp: new Date().toISOString()
+  });
+  localStorage.setItem('pkm_corrections', JSON.stringify(corrections));
+  document.getElementById('feedback-dropdown').querySelector('.fb-note').textContent = 'Correction saved. Thanks!';
+}
+
+init();
 </script>
 </body>
 </html>
