@@ -93,6 +93,11 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 .footer p{color:#444;font-size:0.78rem;line-height:1.8}
 .footer a{color:#666}
 
+.live-stat{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px 14px;font-size:0.72rem;color:#888}
+.live-stat .ls-val{color:#fff;font-weight:700}
+.live-stat .ls-lbl{color:#555;margin-left:4px}
+.self-improving-badge{background:#0a2a0a;border:1px solid #1a3a1a;border-radius:6px;padding:3px 10px;font-size:0.65rem;color:#4ade80;font-weight:600;display:inline-block;margin-top:8px}
+
 .loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 
@@ -107,7 +112,8 @@ a{color:#888;text-decoration:none}a:hover{color:#ccc}
 
   <div class="header">
     <h1>PKM Analyzer</h1>
-    <p>Detect defense modes. Generate bypass messages. Free to use — no API key needed.</p>
+    <p>Self-improving defense mode detection. Every analysis and correction makes the system smarter. Free — no API key needed.</p>
+    <div id="live-stats" style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap"></div>
   </div>
 
   <div class="input-section" id="input-section">
@@ -395,20 +401,67 @@ function rateFeedback(dir) {
   document.getElementById('up-btn').className = dir === 'up' ? 'msg-btn active-up' : 'msg-btn';
   document.getElementById('down-btn').className = dir === 'down' ? 'msg-btn active-down' : 'msg-btn';
   document.getElementById('feedback-dropdown').classList.toggle('visible', dir === 'down');
-  const ratings = JSON.parse(localStorage.getItem('pkm_ratings') || '[]');
-  ratings.push({ mode: currentResult?.mode, feedback: dir, timestamp: new Date().toISOString() });
-  localStorage.setItem('pkm_ratings', JSON.stringify(ratings));
+
+  // Send to backend — this trains the system
+  if (currentResult) {
+    fetch(`${API_BASE}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cache_key: currentResult.input_preview ? currentResult.input_preview.slice(0,16) : '',
+        detected_mode: currentResult.mode,
+        rating: dir,
+        profile_preview: currentResult.input_preview || '',
+      }),
+    }).catch(() => {});
+  }
 }
 
 function saveCorrection() {
   const val = document.getElementById('correct-mode').value;
   if (!val) return;
-  const corrections = JSON.parse(localStorage.getItem('pkm_corrections') || '[]');
-  corrections.push({ detected: currentResult?.mode, actual: val, timestamp: new Date().toISOString() });
-  localStorage.setItem('pkm_corrections', JSON.stringify(corrections));
-  document.getElementById('feedback-dropdown').querySelector('.fb-note').textContent = 'Correction saved. Thanks!';
+
+  // Send correction to backend — this directly improves future classifications
+  if (currentResult) {
+    fetch(`${API_BASE}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cache_key: currentResult.input_preview ? currentResult.input_preview.slice(0,16) : '',
+        detected_mode: currentResult.mode,
+        rating: 'down',
+        correct_mode: val,
+        profile_preview: currentResult.input_preview || '',
+      }),
+    }).catch(() => {});
+  }
+
+  document.getElementById('feedback-dropdown').querySelector('.fb-note').textContent = 'Correction saved — the system will learn from this.';
 }
 
+// Load live stats
+async function loadStats() {
+  try {
+    const res = await fetch(`${API_BASE}/stats`);
+    if (!res.ok) return;
+    const s = await res.json();
+    const el = document.getElementById('live-stats');
+    if (!el) return;
+
+    const items = [];
+    if (s.total_analyses > 0) items.push(`<div class="live-stat"><span class="ls-val">${s.total_analyses}</span><span class="ls-lbl">profiles analyzed</span></div>`);
+    if (s.total_feedback > 0) items.push(`<div class="live-stat"><span class="ls-val">${s.total_feedback}</span><span class="ls-lbl">human corrections</span></div>`);
+    if (s.accuracy > 0) items.push(`<div class="live-stat"><span class="ls-val">${s.accuracy}%</span><span class="ls-lbl">accuracy</span></div>`);
+
+    const modeCount = Object.keys(s.modes || {}).length;
+    if (modeCount > 0) items.push(`<div class="live-stat"><span class="ls-val">${modeCount}/10</span><span class="ls-lbl">modes active</span></div>`);
+
+    items.push('<div class="self-improving-badge">Self-improving from every analysis</div>');
+    el.innerHTML = items.join('');
+  } catch(e) {}
+}
+
+loadStats();
 init();
 </script>
 </body>
