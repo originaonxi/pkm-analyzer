@@ -1,13 +1,13 @@
 # PKM Analyzer
 
-**The persuasion layer for autonomous agents. Profile anyone's digital presence. Detect how they defend against outreach. Generate messages that don't get deleted.**
+**A self-improving persuasion intelligence system. Every analysis makes the next one smarter. Every correction trains the model. The more people use it, the more accurate it gets.**
 
 [![Live App](https://img.shields.io/badge/Try_it_live-PKM_Analyzer-blue?style=for-the-badge)](https://originaonxi.github.io/pkm-analyzer/)
+[![Self-Improving](https://img.shields.io/badge/Self--Improving-Every_Analysis-purple?style=for-the-badge)]()
 [![API](https://img.shields.io/badge/API-Render-46E3B7?style=for-the-badge)](https://pkm-analyzer.onrender.com/modes)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Built with Claude](https://img.shields.io/badge/Claude_Haiku-Anthropic-orange?style=for-the-badge)](https://anthropic.com)
 
-**[Try it free](https://originaonxi.github.io/pkm-analyzer/)** — no API key, no install, no sign-up. Paste a profile, get the defense mode.
+**[Try it free](https://originaonxi.github.io/pkm-analyzer/)** — no API key, no install. Your feedback directly trains the next classification.
 
 ---
 
@@ -27,6 +27,40 @@ This is not personalization. Personalization is "Hey {first_name}, I saw you wor
 
 This is **defense-mode classification** — understanding that a bootstrapped founder who built everything themselves will hear "let us automate that" as "you're not good enough," and writing around it.
 
+## The self-improvement loop
+
+This is not a static classifier. Every interaction makes it better:
+
+```
+User analyzes a profile
+         │
+         v
+Claude classifies → defense mode + bypass message
+         │
+         v
+User rates: thumbs up (correct) or thumbs down (wrong)
+         │
+    ┌────┴─────┐
+    │          │
+  correct    wrong → user selects actual mode
+    │          │
+    v          v
+Both stored in Airtable PKM_Feedback table
+         │
+         v
+Next classification pulls recent corrections
+and injects them into the Claude prompt:
+"Profile like X was detected as Y but was actually Z"
+         │
+         v
+Claude adjusts — same mistake never repeated
+         │
+         v
+The more people use it, the smarter it gets
+```
+
+**This is RLHF running live in production.** Not on a training cluster. In the product. Every day.
+
 ## How it works
 
 ```
@@ -39,9 +73,12 @@ Profile text or LinkedIn URL
    ├──────┬──────────────────────────┤
    │ HIT  │         MISS             │
    │      │          |               │
+   │      │    Pull corrections       │
+   │      │    from PKM_Feedback      │
+   │      │          |               │
    │      │    Claude Haiku           │
    │      │    Classify → 1 of 10    │
-   │      │    defense modes          │
+   │      │    (with learned fixes)   │
    │      │          |               │
    │      │    Claude Haiku           │
    │      │    Generate bypass msg    │
